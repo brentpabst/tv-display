@@ -1,6 +1,6 @@
 services:
   web:
-    build: .
+    image: brentpabst/tv-display
     ports:
       - 8080:80
     env_file:
