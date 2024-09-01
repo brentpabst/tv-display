@@ -1,5 +1,5 @@
 # Build the Vite project
-FROM node:16 AS build
+FROM node:22 AS build
 WORKDIR /app
 COPY package*.json ./
 RUN npm install
