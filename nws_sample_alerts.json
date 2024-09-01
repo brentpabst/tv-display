@@ -1,0 +1,159 @@
+{
+  "@context": [
+    "https://geojson.org/geojson-ld/geojson-context.jsonld",
+    {
+      "@version": "1.1",
+      "wx": "https://api.weather.gov/ontology#",
+      "@vocab": "https://api.weather.gov/ontology#"
+    }
+  ],
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "id": "https://api.weather.gov/alerts/urn:oid:2.49.0.1.840.0.725f7e179eda832cb9b16e4ab1c42f6705f5c353.001.1",
+      "type": "Feature",
+      "geometry": null,
+      "properties": {
+        "@id": "https://api.weather.gov/alerts/urn:oid:2.49.0.1.840.0.725f7e179eda832cb9b16e4ab1c42f6705f5c353.001.1",
+        "@type": "wx:Alert",
+        "id": "urn:oid:2.49.0.1.840.0.725f7e179eda832cb9b16e4ab1c42f6705f5c353.001.1",
+        "areaDesc": "Granville; Vance; Warren; Halifax; Orange; Durham; Franklin; Nash; Edgecombe; Chatham; Wake; Johnston; Wilson; Lee; Harnett; Wayne; Cumberland; Sampson",
+        "geocode": {
+          "SAME": [
+            "037077",
+            "037181",
+            "037185",
+            "037083",
+            "037135",
+            "037063",
+            "037069",
+            "037127",
+            "037065",
+            "037037",
+            "037183",
+            "037101",
+            "037195",
+            "037105",
+            "037085",
+            "037191",
+            "037051",
+            "037163"
+          ],
+          "UGC": [
+            "NCZ008",
+            "NCZ009",
+            "NCZ010",
+            "NCZ011",
+            "NCZ024",
+            "NCZ025",
+            "NCZ026",
+            "NCZ027",
+            "NCZ028",
+            "NCZ040",
+            "NCZ041",
+            "NCZ042",
+            "NCZ043",
+            "NCZ076",
+            "NCZ077",
+            "NCZ078",
+            "NCZ088",
+            "NCZ089"
+          ]
+        },
+        "affectedZones": [
+          "https://api.weather.gov/zones/forecast/NCZ008",
+          "https://api.weather.gov/zones/forecast/NCZ009",
+          "https://api.weather.gov/zones/forecast/NCZ010",
+          "https://api.weather.gov/zones/forecast/NCZ011",
+          "https://api.weather.gov/zones/forecast/NCZ024",
+          "https://api.weather.gov/zones/forecast/NCZ025",
+          "https://api.weather.gov/zones/forecast/NCZ026",
+          "https://api.weather.gov/zones/forecast/NCZ027",
+          "https://api.weather.gov/zones/forecast/NCZ028",
+          "https://api.weather.gov/zones/forecast/NCZ040",
+          "https://api.weather.gov/zones/forecast/NCZ041",
+          "https://api.weather.gov/zones/forecast/NCZ042",
+          "https://api.weather.gov/zones/forecast/NCZ043",
+          "https://api.weather.gov/zones/forecast/NCZ076",
+          "https://api.weather.gov/zones/forecast/NCZ077",
+          "https://api.weather.gov/zones/forecast/NCZ078",
+          "https://api.weather.gov/zones/forecast/NCZ088",
+          "https://api.weather.gov/zones/forecast/NCZ089"
+        ],
+        "references": [],
+        "sent": "2024-08-28T15:00:00-04:00",
+        "effective": "2024-08-28T15:00:00-04:00",
+        "onset": "2024-08-29T12:00:00-04:00",
+        "expires": "2024-08-29T05:00:00-04:00",
+        "ends": "2024-08-29T19:00:00-04:00",
+        "status": "Actual",
+        "messageType": "Alert",
+        "category": "Met",
+        "severity": "Moderate",
+        "certainty": "Likely",
+        "urgency": "Expected",
+        "event": "Heat Advisory",
+        "sender": "w-nws.webmaster@noaa.gov",
+        "senderName": "NWS Raleigh NC",
+        "headline": "Heat Advisory issued August 28 at 3:00PM EDT until August 29 at 7:00PM EDT by NWS Raleigh NC",
+        "description": "* WHAT...Heat index values up to 105 expected.\n\n* WHERE...The Coastal Plain, eastern Sandhills, and a portion of the\nnortheast Piedmont of central North Carolina.\n\n* WHEN...From noon to 7 PM EDT Thursday.\n\n* IMPACTS...Hot temperatures and high humidity may cause heat\nillnesses.",
+        "instruction": "Drink plenty of fluids, stay in an air-conditioned room, stay out of\nthe sun, and check on relatives and neighbors.",
+        "response": "Execute",
+        "parameters": {
+          "AWIPSidentifier": ["NPWRAH"],
+          "WMOidentifier": ["WWUS72 KRAH 281900"],
+          "NWSheadline": ["HEAT ADVISORY IN EFFECT FROM NOON TO 7 PM EDT THURSDAY"],
+          "BLOCKCHANNEL": ["EAS", "NWEM", "CMAS"],
+          "VTEC": ["/O.NEW.KRAH.HT.Y.0015.240829T1600Z-240829T2300Z/"],
+          "eventEndingTime": ["2024-08-29T23:00:00+00:00"]
+        }
+      }
+    },
+    {
+      "id": "https://api.weather.gov/alerts/urn:oid:2.49.0.1.840.0.f46e7c164c5c8704d4ea70105e5543391051b58c.001.1",
+      "type": "Feature",
+      "geometry": null,
+      "properties": {
+        "@id": "https://api.weather.gov/alerts/urn:oid:2.49.0.1.840.0.f46e7c164c5c8704d4ea70105e5543391051b58c.001.1",
+        "@type": "wx:Alert",
+        "id": "urn:oid:2.49.0.1.840.0.f46e7c164c5c8704d4ea70105e5543391051b58c.001.1",
+        "areaDesc": "Franklin; Wake",
+        "geocode": {
+          "SAME": ["037069", "037183"],
+          "UGC": ["NCZ026", "NCZ041"]
+        },
+        "affectedZones": [
+          "https://api.weather.gov/zones/forecast/NCZ026",
+          "https://api.weather.gov/zones/forecast/NCZ041"
+        ],
+        "references": [],
+        "sent": "2024-08-28T11:13:00-04:00",
+        "effective": "2024-08-28T11:13:00-04:00",
+        "onset": "2024-08-28T11:13:00-04:00",
+        "expires": "2024-08-28T20:00:00-04:00",
+        "ends": null,
+        "status": "Actual",
+        "messageType": "Alert",
+        "category": "Met",
+        "severity": "Unknown",
+        "certainty": "Unknown",
+        "urgency": "Unknown",
+        "event": "Air Quality Alert",
+        "sender": "w-nws.webmaster@noaa.gov",
+        "senderName": "NWS Raleigh NC",
+        "headline": "Air Quality Alert issued August 28 at 11:13AM EDT by NWS Raleigh NC",
+        "description": "The North Carolina Department of Environmental Quality in Raleigh NC\nhas issued a Code Orange Air Quality Action Day for Ground Level\nOzone, until 8 PM EDT this evening.\n\nAn Air Quality Action Day means that Ground Level Ozone\nconcentrations within the region may approach or exceed unhealthy\nstandards. For additional information, please visit the North\nCarolina Division of Air Quality Web site at\nhttps://airquality.climate.ncsu.edu",
+        "instruction": null,
+        "response": "Monitor",
+        "parameters": {
+          "AWIPSidentifier": ["AQARAH"],
+          "WMOidentifier": ["AEUS72 KRAH 281513"],
+          "NWSheadline": ["AIR QUALITY ALERT IN EFFECT UNTIL 8 PM EDT THIS EVENING"],
+          "BLOCKCHANNEL": ["EAS", "NWEM", "CMAS"]
+        }
+      }
+    }
+  ],
+  "title": "Current watches, warnings, and advisories for 35.9863 N, 78.6796 W",
+  "updated": "2024-08-28T19:02:12+00:00"
+}

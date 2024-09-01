@@ -1,0 +1,37 @@
+@import './base.css';
+
+#app {
+  margin: 0 auto;
+  color: white;
+}
+
+.fancy {
+  font-family: kalam, sans-serif;
+  font-size: 3em;
+}
+
+.container {
+  display: flex;
+  min-height: 100vh;
+  flex-direction: column;
+}
+
+.main {
+  display: flex;
+  flex: 1;
+  padding: 2em;
+}
+
+.left > div:not(:last-child),
+.right > div:not(:last-child) {
+  margin-bottom: 1em;
+}
+
+.left {
+  flex: 3;
+}
+
+.right {
+  flex: 1;
+  margin-left: auto;
+}

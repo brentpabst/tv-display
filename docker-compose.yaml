@@ -1,0 +1,15 @@
+services:
+  web:
+    build: .
+    ports:
+      - 8080:80
+    env_file:
+      - .env
+    depends_on:
+      cors-anywhere:
+        condition: service_started
+
+  cors-anywhere:
+    image: testcab/cors-anywhere
+    ports:
+      - 9090:8080
