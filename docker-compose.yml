@@ -7,7 +7,6 @@ services:
       - .env
     depends_on:
       - cors-anywhere
-        condition: service_started
 
   cors-anywhere:
     image: testcab/cors-anywhere
