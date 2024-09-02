@@ -24,7 +24,6 @@ jobs:
       - name: Create .env file
         uses: SpicyPizza/create-envfile@v2.0.3
         with:
-          directory: app
           envkey_VITE_CORS_PROXY_URL: ${{ secrets.VITE_CORS_PROXY_URL }}
           envkey_VITE_LATITUDE: ${{ secrets.VITE_LATITUDE }}
           envkey_VITE_LONGITUDE: ${{ secrets.VITE_LONGITUDE }}
@@ -33,6 +32,14 @@ jobs:
           envkey_VITE_WEATHERFLOW_DEVICE_ID: ${{ secrets.VITE_WEATHERFLOW_DEVICE_ID }}
           envkey_VITE_ICAL_SYNC_INTERVAL: ${{ secrets.VITE_ICAL_SYNC_INTERVAL }}
           envkey_VITE_ICAL_FEED_URLS: ${{ secrets.VITE_ICAL_FEED_URLS }}
+      - name: List Files
+        id: list-files
+        uses: mirko-felice/list-files-action@v3.0.5
+        with:
+          repo: ${{ github.repository }}
+          ref: ${{ github.ref }}
+          path: '.'
+          ext: '.env'
       - name: Build and push
         uses: docker/build-push-action@v6
         with:
