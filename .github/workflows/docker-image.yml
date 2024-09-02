@@ -24,6 +24,7 @@ jobs:
           envkey_VITE_ICAL_SYNC_INTERVAL: ${{ secrets.VITE_ICAL_SYNC_INTERVAL }}
           envkey_VITE_ICAL_FEED_URLS: ${{ secrets.VITE_ICAL_FEED_URLS }}
           file_name: .env.production
+          directory: /app
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v3
       - name: Set up Docker Buildx
