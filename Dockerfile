@@ -4,6 +4,8 @@ WORKDIR /app
 COPY package*.json ./
 RUN npm install
 COPY . .
+RUN ls -la
+RUN cat .env
 RUN npm run build
 
 # Setup the Nginx server

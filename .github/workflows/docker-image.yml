@@ -32,7 +32,6 @@ jobs:
           envkey_VITE_WEATHERFLOW_DEVICE_ID: ${{ secrets.VITE_WEATHERFLOW_DEVICE_ID }}
           envkey_VITE_ICAL_SYNC_INTERVAL: ${{ secrets.VITE_ICAL_SYNC_INTERVAL }}
           envkey_VITE_ICAL_FEED_URLS: ${{ secrets.VITE_ICAL_FEED_URLS }}
-          file_name: .env.production
       - name: Build and push
         uses: docker/build-push-action@v6
         with:
