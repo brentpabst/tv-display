@@ -1,4 +1,5 @@
 #!/bin/sh
+set -x
 BUILD_DIR="/usr/share/nginx/html/assets"
 
 get_env_value() {
