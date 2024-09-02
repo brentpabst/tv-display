@@ -8,13 +8,13 @@ const convert = configureMeasurements(allMeasures)
 
 const weatherflow_url =
   'wss://ws.weatherflow.com/swd/data?token=' + import.meta.env.VITE_WEATHERFLOW_TOKEN ||
-  '__WEATHERFLOW_TOKEN__'
+  '__VITE_WEATHERFLOW_TOKEN__'
 
 const weatherflow_forecast_url =
   'https://swd.weatherflow.com/swd/rest/better_forecast?station_id=' +
-  (import.meta.env.VITE_WEATHERFLOW_STATION_ID || '__WEATHERFLOW_STATION_ID__') +
+  (import.meta.env.VITE_WEATHERFLOW_STATION_ID || '__VITE_WEATHERFLOW_STATION_ID__') +
   '&token=' +
-  (import.meta.env.VITE_WEATHERFLOW_TOKEN || '__WEATHERFLOW_TOKEN__') +
+  (import.meta.env.VITE_WEATHERFLOW_TOKEN || '__VITE_WEATHERFLOW_TOKEN__') +
   '&units_temp=f&units_wind=mph&units_pressure=inhg&units_precip=in&units_distance=mi'
 
 const condition_icons = new Map()
@@ -51,8 +51,8 @@ export const useWeatherStore = defineStore('weather', {
       this.startWeatherFlow()
       this.getSunCalcs(
         new Date(),
-        import.meta.env.VITE_LATITUDE || '__LATITUDE__',
-        import.meta.env.VITE_LONGITUDE || '__LONGITUDE__'
+        import.meta.env.VITE_LATITUDE || '__VITE_LATITUDE__',
+        import.meta.env.VITE_LONGITUDE || '__VITE_LONGITUDE__'
       )
       this.getMoonCalcs(new Date())
       this.getForecast()
@@ -60,8 +60,8 @@ export const useWeatherStore = defineStore('weather', {
     refresh() {
       this.getSunCalcs(
         new Date(),
-        import.meta.env.VITE_LATITUDE || '__LATITUDE__',
-        import.meta.env.VITE_LONGITUDE || '__LONGITUDE__'
+        import.meta.env.VITE_LATITUDE || '__VITE_LATITUDE__',
+        import.meta.env.VITE_LONGITUDE || '__VITE_LONGITUDE__'
       )
       this.getMoonCalcs(new Date())
       this.getForecast()
@@ -73,14 +73,16 @@ export const useWeatherStore = defineStore('weather', {
         this.socket.send(
           JSON.stringify({
             type: 'listen_start',
-            device_id: import.meta.env.VITE_WEATHERFLOW_DEVICE_ID || '__WEATHERFLOW_DEVICE_ID__',
+            device_id:
+              import.meta.env.VITE_WEATHERFLOW_DEVICE_ID || '__VITE_WEATHERFLOW_DEVICE_ID__',
             id: Math.random(1, 100000000)
           })
         )
         this.socket.send(
           JSON.stringify({
             type: 'listen_rapid_start',
-            device_id: import.meta.env.VITE_WEATHERFLOW_DEVICE_ID || '__WEATHERFLOW_DEVICE_ID__',
+            device_id:
+              import.meta.env.VITE_WEATHERFLOW_DEVICE_ID || '__VITE_WEATHERFLOW_DEVICE_ID__',
             id: Math.random(1, 100000000)
           })
         )

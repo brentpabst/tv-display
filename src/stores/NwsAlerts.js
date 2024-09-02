@@ -2,9 +2,9 @@ import { defineStore } from 'pinia'
 
 const nws_url =
   'https://api.weather.gov/alerts/active?point=' +
-  (import.meta.env.VITE_LATITUDE || '__LATITUDE__') +
+  (import.meta.env.VITE_LATITUDE || '__VITE_LATITUDE__') +
   ',' +
-  (import.meta.env.VITE_LONGITUDE || '__LONGITUDE__')
+  (import.meta.env.VITE_LONGITUDE || '__VITE_LONGITUDE__')
 
 export const useNwsAlertStore = defineStore('alerts', {
   state: () => ({

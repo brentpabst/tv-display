@@ -10,9 +10,9 @@ export const useCalendarFeedsStore = defineStore('calendarFeeds', {
 
   actions: {
     async fetchFeeds() {
-      let feeds = JSON.parse(import.meta.env.VITE_ICAL_FEED_URLS || '__ICAL_FEED_URLS__')
+      let feeds = JSON.parse(import.meta.env.VITE_ICAL_FEED_URLS || '__VITE_ICAL_FEED_URLS__')
       let proxiedUrls = feeds.map(
-        (feed) => (import.meta.env.VITE_CORS_PROXY_URL || '__CORS_PROXY_URL__') + '/' + feed
+        (feed) => (import.meta.env.VITE_CORS_PROXY_URL || '__VITE_CORS_PROXY_URL__') + '/' + feed
       )
       const fetchPromises = proxiedUrls.map(async (feed) => {
         const response = await fetch(feed)
