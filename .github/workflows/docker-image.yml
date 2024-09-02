@@ -21,6 +21,8 @@ jobs:
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
+      - name: Test output
+        run: cat .env
       - name: Create .env file
         uses: SpicyPizza/create-envfile@v2.0.3
         with:
