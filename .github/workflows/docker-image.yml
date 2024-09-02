@@ -61,6 +61,8 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: vue-dist
+      - name: Show Local Dir
+        run: ls -la
       - name: Build and push
         uses: docker/build-push-action@v6
         with:
