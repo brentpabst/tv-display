@@ -32,14 +32,6 @@ jobs:
           envkey_VITE_WEATHERFLOW_DEVICE_ID: ${{ secrets.VITE_WEATHERFLOW_DEVICE_ID }}
           envkey_VITE_ICAL_SYNC_INTERVAL: ${{ secrets.VITE_ICAL_SYNC_INTERVAL }}
           envkey_VITE_ICAL_FEED_URLS: ${{ secrets.VITE_ICAL_FEED_URLS }}
-      - name: List Files
-        id: list-files
-        uses: mirko-felice/list-files-action@v3.0.5
-        with:
-          repo: ${{ github.repository }}
-          ref: ${{ github.ref }}
-          path: '.'
-          ext: '.env'
       - name: Test output
         run: cat .env
       - name: Build and push
