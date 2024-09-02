@@ -15,15 +15,15 @@ jobs:
       - name: Create .env file
         uses: SpicyPizza/create-envfile@v2.0.3
         with:
-          - envkey_VITE_CORS_PROXY_URL: ${{ secrets.VITE_CORS_PROXY_URL }}
-          - envkey_VITE_LATITUDE: ${{ secrets.VITE_LATITUDE }}
-          - envkey_VITE_LONGITUDE: ${{ secrets.VITE_LONGITUDE }}
-          - envkey_VITE_WEATHERFLOW_TOKEN: ${{ secrets.VITE_WEATHERFLOW_TOKEN }}
-          - envkey_VITE_WEATHERFLOW_STATION_ID: ${{ secrets.VITE_WEATHERFLOW_STATION_ID }}
-          - envkey_VITE_WEATHERFLOW_DEVICE_ID: ${{ secrets.VITE_WEATHERFLOW_DEVICE_ID }}
-          - envkey_VITE_ICAL_SYNC_INTERVAL: ${{ secrets.VITE_ICAL_SYNC_INTERVAL }}
-          - envkey_VITE_ICAL_FEED_URLS: ${{ secrets.VITE_ICAL_FEED_URLS }}
-          - file_name: .env.production
+          envkey_VITE_CORS_PROXY_URL: ${{ secrets.VITE_CORS_PROXY_URL }}
+          envkey_VITE_LATITUDE: ${{ secrets.VITE_LATITUDE }}
+          envkey_VITE_LONGITUDE: ${{ secrets.VITE_LONGITUDE }}
+          envkey_VITE_WEATHERFLOW_TOKEN: ${{ secrets.VITE_WEATHERFLOW_TOKEN }}
+          envkey_VITE_WEATHERFLOW_STATION_ID: ${{ secrets.VITE_WEATHERFLOW_STATION_ID }}
+          envkey_VITE_WEATHERFLOW_DEVICE_ID: ${{ secrets.VITE_WEATHERFLOW_DEVICE_ID }}
+          envkey_VITE_ICAL_SYNC_INTERVAL: ${{ secrets.VITE_ICAL_SYNC_INTERVAL }}
+          envkey_VITE_ICAL_FEED_URLS: ${{ secrets.VITE_ICAL_FEED_URLS }}
+          file_name: .env.production
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v3
       - name: Set up Docker Buildx
