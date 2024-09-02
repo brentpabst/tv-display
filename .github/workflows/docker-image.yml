@@ -2,30 +2,50 @@ name: Docker Image CI
 
 on:
   push:
-    branches: [ "main" ]
+    branches: ['main']
   pull_request:
-    branches: [ "main" ]
+    branches: ['main']
 
 jobs:
+  create-envfile:
+    runs-on: ubuntu-18.04
+
+    steps:
+      - name: Make envfile
+        uses: SpicyPizza/create-envfile@v1
+        with:
+          envkey_DEBUG: false
+          envkey_SOME_API_KEY: '123456abcdef'
+          envkey_SECRET_KEY: ${{ secrets.SECRET_KEY }}
+          file_name: .env
 
   build:
-
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v4
-    - name: Set up QEMU
-      uses: docker/setup-qemu-action@v3
-    - name: Set up Docker Buildx
-      uses: docker/setup-buildx-action@v3
-    - name: Login to Docker Hub
-      uses: docker/login-action@v3
-      with:
-        username: ${{ secrets.DOCKERHUB_USERNAME }}
-        password: ${{ secrets.DOCKERHUB_TOKEN }}
-    -
-      name: Build and push
-      uses: docker/build-push-action@v6
-      with:
-        push: true
-        tags: brentpabst/tv-display:latest
+      - uses: actions/checkout@v4
+      - name: Create .env file
+        uses: SpicyPizza/create-envfile@v2.0.3
+        with:
+          envkey_VITE_CORS_PROXY_URL: ${{ secrets.VITE_CORS_PROXY_URL }}
+          envkey_VITE_LATITUDE: ${{ secrets.VITE_LATITUDE }}
+          envkey_VITE_LONGITUDE: ${{ secrets.VITE_LONGITUDE }}
+          envkey_VITE_WEATHERFLOW_TOKEN: ${{ secrets.VITE_WEATHERFLOW_TOKEN }}
+          envkey_VITE_WEATHERFLOW_STATION_ID: ${{ secrets.VITE_WEATHERFLOW_STATION_ID }}
+          envkey_VITE_WEATHERFLOW_DEVICE_ID: ${{ secrets.VITE_WEATHERFLOW_DEVICE_ID }}
+          envkey_VITE_ICAL_SYNC_INTERVAL: ${{ secrets.VITE_ICAL_SYNC_INTERVAL }}
+          envkey_VITE_ICAL_FEED_URLS: ${{ secrets.VITE_ICAL_FEED_URLS }}
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v3
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+      - name: Login to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+      - name: Build and push
+        uses: docker/build-push-action@v6
+        with:
+          push: true
+          tags: brentpabst/tv-display:latest

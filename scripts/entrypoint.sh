@@ -11,10 +11,6 @@ VITE_WEATHERFLOW_DEVICE_ID
 VITE_ICAL_SYNC_INTERVAL
 VITE_ICAL_FEED_URLS"
 
-la -la $BUILD_DIR
-
-cat /etc/nginx/nginx.conf
-
 for file in "$BUILD_DIR"/*.js ;
 do
   echo "Processing $file ...";
