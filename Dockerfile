@@ -5,6 +5,7 @@ COPY package*.json ./
 RUN npm install
 COPY . .
 COPY .env ./
+RUN cat .env
 RUN npm run build
 
 # Setup the Nginx server
