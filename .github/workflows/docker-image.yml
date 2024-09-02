@@ -19,8 +19,6 @@ jobs:
           node-version: '22'
       - name: 📥 Install dependencies
         run: npm install
-      - name: Test output
-        run: cat .env
       - name: Create .env file
         uses: SpicyPizza/create-envfile@v2.0.3
         with:
@@ -33,11 +31,8 @@ jobs:
           envkey_VITE_WEATHERFLOW_DEVICE_ID: ${{ secrets.VITE_WEATHERFLOW_DEVICE_ID }}
           envkey_VITE_ICAL_SYNC_INTERVAL: ${{ secrets.VITE_ICAL_SYNC_INTERVAL }}
           envkey_VITE_ICAL_FEED_URLS: ${{ secrets.VITE_ICAL_FEED_URLS }}
-      - name: Test output
-        run: cat .env
       - name: 🏗️ Build
         run: npm run build
-
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v3
       - name: Set up Docker Buildx
@@ -47,8 +42,6 @@ jobs:
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
-      - name: Show Local Dir
-        run: ls -la
       - name: Build and push
         uses: docker/build-push-action@v6
         with:
