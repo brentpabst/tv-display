@@ -43,8 +43,11 @@
       <div class="xsmall thin">
         <VueFeather type="droplet" size="0.7rem" />{{ forecast.precip_probability }}%
       </div>
-      <div class="small light">{{ forecast.air_temp_high }}° | {{ forecast.air_temp_low }}°</div>
-      <div></div>
+      <div class="temps small light">
+        <VueFeather type="arrow-up" />{{ forecast.air_temp_high }}°<VueFeather
+          type="arrow-down"
+        />{{ forecast.air_temp_low }}°
+      </div>
     </div>
   </div>
   <div v-if="store.weather.lightning_strike_count > 0" class="lightning">
@@ -109,6 +112,13 @@ onMounted(() => {
   height: 1rem;
   margin-right: 0.25rem;
   margin-left: 0.5rem;
+}
+
+.temps .vue-feather {
+  width: 1rem;
+  height: 1rem;
+  margin-right: 0rem;
+  margin-left: 0rem;
 }
 
 .lightning {
