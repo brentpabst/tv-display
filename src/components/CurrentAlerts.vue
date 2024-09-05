@@ -28,7 +28,7 @@ setInterval(() => store.getAlerts(), 1000 * 60)
   gap: 1em;
   align-items: stretch;
   background-color: rgba(255, 0, 0, 0.75);
-  padding: 1em 2em;
+  padding: 2.5em 4em;
 }
 
 .messages {
