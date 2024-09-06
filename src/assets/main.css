@@ -19,7 +19,10 @@
 .main {
   display: flex;
   flex: 1;
-  padding: 3em 5em;
+  margin-top: calc(2rem + 0.390625vw);
+  margin-top: calc(2rem + 0.390625vw);
+  margin-left: calc(4rem + 0.390625vw);
+  margin-right: calc(4rem + 0.390625vw);
 }
 
 .left > div:not(:last-child),
@@ -28,10 +31,10 @@
 }
 
 .left {
-  flex: 3;
+  flex: 2;
 }
 
 .right {
-  flex: 2;
+  flex: 1;
   margin-left: auto;
 }
