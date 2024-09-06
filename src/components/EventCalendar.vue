@@ -2,8 +2,7 @@
   <div class="calendar">
     <div class="event" v-for="day in store.feeds" :key="day.id">
       <div class="event-date">
-        <span class="small light">{{ $filters.moment(day[0].start, 'D') }}</span>
-        &nbsp;
+        <span class="small light day">{{ $filters.moment(day[0].start, 'D') }}</span>
         <span class="xsmall light">{{ $filters.moment(day[0].start, 'MMMM, dddd') }}</span>
       </div>
       <div class="event-title" v-for="item in day" :key="item.id">
@@ -28,6 +27,10 @@
 
 .calendar .event .event-date {
   padding-left: 5px;
+}
+
+.calendar .event .event-date .day {
+  padding-right: 0.25em;
 }
 
 .calendar .event .event-title {

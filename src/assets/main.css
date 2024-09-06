@@ -19,7 +19,7 @@
 .main {
   display: flex;
   flex: 1;
-  padding: 80px 180px;
+  padding: 2em 4em;
 }
 
 .left > div:not(:last-child),
