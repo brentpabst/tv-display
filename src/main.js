@@ -4,6 +4,7 @@ import { createApp } from 'vue'
 import { createPinia } from 'pinia'
 import moment from 'moment'
 import VueFeather from 'vue-feather'
+import { autoAnimatePlugin } from '@formkit/auto-animate/vue'
 
 import App from './App.vue'
 
@@ -12,6 +13,7 @@ const pinia = createPinia()
 const app = createApp(App)
 
 app.use(pinia)
+app.use(autoAnimatePlugin)
 
 app.config.globalProperties.$filters = {
   momentUnix(date, format) {

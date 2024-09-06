@@ -13,6 +13,7 @@
     </div>
     <div class="lower">
       <CurrentAlerts />
+      <NewsHeadlines />
     </div>
   </div>
 </template>
@@ -35,13 +36,15 @@ import CurrentWeather from './components/CurrentWeather.vue'
 import CurrentAlerts from './components/CurrentAlerts.vue'
 import moment from 'moment'
 import EventCalendar from './components/EventCalendar.vue'
+import NewsHeadlines from './components/NewsHeadlines.vue'
 export default {
   components: {
     VideoBackground,
     DigitalClock,
     EventCalendar,
     CurrentWeather,
-    CurrentAlerts
+    CurrentAlerts,
+    NewsHeadlines
   },
   data() {
     return {

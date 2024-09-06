@@ -13,7 +13,7 @@
   "dependencies": {
     "@fontsource/kalam": "^5.0.13",
     "@fontsource/roboto": "^5.0.14",
-    "@lxg/weather-icons": "^3.0.1",
+    "@formkit/auto-animate": "^0.8.2",
     "convert-units": "^3.0.0-beta.6",
     "feather-icons": "^4.29.2",
     "ical": "^0.8.0",
