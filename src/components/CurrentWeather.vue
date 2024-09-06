@@ -152,7 +152,7 @@ onMounted(() => {
 }
 
 .day {
-  background-color: rgba(255, 255, 255, 0.3);
+  background-color: var(--background-blur);
   padding: 0.5em;
   border-radius: 5px;
   margin-bottom: 0.5em;

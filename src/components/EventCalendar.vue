@@ -35,7 +35,7 @@
 
 .calendar .event .event-title {
   padding: 5px 5px 5px 10px;
-  background-color: rgba(255, 255, 255, 0.3);
+  background-color: var(--background-blur);
   border-radius: 5px;
   border-left: solid 5px white;
   margin-bottom: 10px;
