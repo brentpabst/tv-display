@@ -5,6 +5,7 @@ import { createPinia } from 'pinia'
 import moment from 'moment'
 import VueFeather from 'vue-feather'
 import { autoAnimatePlugin } from '@formkit/auto-animate/vue'
+import { VOffline } from 'v-offline'
 
 import App from './App.vue'
 
@@ -40,5 +41,6 @@ app.config.globalProperties.$filters = {
 }
 
 app.component(VueFeather.name, VueFeather)
+app.component('VOffline', VOffline)
 
 app.mount('#app')

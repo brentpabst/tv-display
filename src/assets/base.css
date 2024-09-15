@@ -82,3 +82,8 @@ body {
 .upper {
   text-transform: uppercase;
 }
+
+sup {
+  font-size: 50%;
+  line-height: 50%;
+}

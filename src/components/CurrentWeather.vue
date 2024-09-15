@@ -129,10 +129,6 @@ onMounted(() => {
   align-items: center;
 }
 
-.pulse {
-  animation: pulse 1s infinite;
-}
-
 .lightning .info {
   display: grid;
   gap: 0.5em;
@@ -149,24 +145,12 @@ onMounted(() => {
 
 .forecast {
   text-align: center;
-}
-
-.day {
   background-color: var(--background-blur);
   padding: 0.5em;
   border-radius: 5px;
-  margin-bottom: 0.5em;
 }
 
-@keyframes pulse {
-  0% {
-    transform: scale(0.8);
-  }
-  50% {
-    transform: scale(1.1);
-  }
-  100% {
-    transform: scale(0.8);
-  }
+.day {
+  margin-bottom: 0.5em;
 }
 </style>
