@@ -1,12 +1,12 @@
 import { defineStore } from 'pinia'
 import moment from 'moment'
 
-const apiUrl = 'https://site.web.api.espn.com/apis/site/v2/sports/hockey/nhl/teams/CAR'
+const espn_url = 'https://site.web.api.espn.com/apis/site/v2/sports/hockey/nhl/teams/CAR'
 
 export const useEspnStore = defineStore('espn', {
   state: () => ({
     event: {},
-    lastUpdate: null
+    last_update: null
   }),
   getters: {
     competition: (state) => {
@@ -28,34 +28,39 @@ export const useEspnStore = defineStore('espn', {
         )
     },
     refreshInterval: (state) => {
-      if (!state.competition) return 3600000 // 1 hour
+      if (!state.competition) {
+        console.log('No Event Scheduled')
+        return 3600000 // 30 minutes
+      }
       if (
         state.competition.status.type.state == 'in' ||
         (moment().isSameOrAfter(state.competition.date) &&
           state.competition.status.type.state != 'post')
-      )
+      ) {
+        console.log('Event in Progress')
         return 15000 // 15 seconds
-      else if (state.competition.status.type.state == 'pre')
+      } else if (state.competition.status.type.state == 'pre') {
+        console.log('Event Scheduled')
         return 900000 // 15 minutes
-      else if (state.competition.status.type.state == 'post')
+      } else if (state.competition.status.type.state == 'post') {
+        console.log('Event Complete')
         return 3600000 // 1 hour
-      else return 3600000 // 1 hour
+      } else return 3600000 // 1 hour
     }
   },
   actions: {
-    async initialize() {
-      this.getData()
-    },
-    async refresh() {
-      this.getData()
-    },
     async getData() {
-      await fetch(apiUrl)
-        .then((response) => response.json())
-        .then((data) => {
-          this.event = Object.assign(this.event, data.team.nextEvent[0])
-          this.lastUpdate = new Date()
-        })
+      try {
+        await fetch(espn_url)
+          .then((response) => response.json())
+          .then((data) => {
+            this.event = Object.assign(this.event, data.team.nextEvent[0])
+            this.last_update = moment().unix()
+          })
+      } catch (error) {
+        console.error(error)
+        return error
+      }
     }
   }
 })

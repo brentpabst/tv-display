@@ -39,7 +39,7 @@ app.config.globalProperties.$filters = {
     return moment(date).fromNow()
   },
   duration(milliseconds) {
-    return moment.duration(milliseconds).humanize()
+    return moment.duration(milliseconds).humanize(true)
   }
 }
 

@@ -3,8 +3,8 @@
     <div class="name">
       <p class="small light upper">{{ store.event.name }}</p>
       <p class="xsmall thin">
-        updates every {{ $filters.duration(store.refreshInterval) }} | updated
-        {{ $filters.timeago(store.lastUpdate) }}
+        updates {{ $filters.duration(store.refreshInterval) }} | updated
+        {{ $filters.timeagoUnix(store.last_update) }}
       </p>
     </div>
     <div class="away">
@@ -101,27 +101,18 @@
 </style>
 
 <script setup>
-import { onMounted, onUnmounted } from 'vue'
 import { useEspnStore } from '@/stores/Espn'
 
 const store = useEspnStore()
-store.initialize()
+store.getData()
 
-onMounted(() => {
-  // Start updating data on an interval
-  let interval = store.refreshInterval
-  let intervalId = setInterval(refreshInterval, interval)
-
-  function refreshInterval() {
-    clearInterval(intervalId)
+let interval = 10000
+let loop = setInterval(() => {
+  clearInterval(loop)
+  store.getData()
+  loop = setInterval(() => {
+    console.log(store.refreshInterval)
     store.getData()
-
-    intervalId = setInterval(refreshInterval, interval)
-  }
-
-  // Stop updating data when the component is unmounted
-  onUnmounted(() => {
-    clearInterval(intervalId)
-  })
-})
+  }, store.refreshInterval)
+}, interval)
 </script>
