@@ -37,6 +37,9 @@ app.config.globalProperties.$filters = {
   },
   timeago(date) {
     return moment(date).fromNow()
+  },
+  duration(milliseconds) {
+    return moment.duration(milliseconds).humanize()
   }
 }
 

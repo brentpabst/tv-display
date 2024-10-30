@@ -17,6 +17,7 @@
       </div>
       <div class="right">
         <CurrentWeather />
+        <EspnDisplay />
       </div>
     </div>
     <div class="lower">
@@ -57,6 +58,7 @@ import EventCalendar from './components/EventCalendar.vue'
 import NewsHeadlines from './components/NewsHeadlines.vue'
 import { VOffline } from 'v-offline'
 import { ref } from 'vue'
+import EspnDisplay from './components/EspnDisplay.vue'
 
 export default {
   components: {
@@ -66,6 +68,7 @@ export default {
     CurrentWeather,
     CurrentAlerts,
     NewsHeadlines,
+    EspnDisplay,
     VOffline
   },
   setup() {
