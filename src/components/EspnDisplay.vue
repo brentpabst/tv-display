@@ -13,7 +13,7 @@
         {{ store.awayTeam.team.shortDisplayName }}
       </p>
       <p class="small" v-if="store.awayTeam.record">
-        {{ store.awayTeam.record.find((team) => team.type == 'ytd').displayValue }}
+        {{ store.awayTeam.record.find((team) => team.type == 'total').displayValue }}
       </p>
     </div>
     <div class="info">
@@ -31,6 +31,7 @@
       >
         {{ store.awayTeam.score.displayValue }} - {{ store.homeTeam.score.displayValue }}
       </div>
+      <div class="large light" v-else>0 - 0</div>
       <p class="small thin upper" v-if="store.competition.status.type.state != 'pre'">
         {{ store.competition.status.type.shortDetail }}
       </p>
@@ -41,7 +42,7 @@
         {{ store.homeTeam.team.shortDisplayName }}
       </p>
       <p class="small" v-if="store.homeTeam.record">
-        {{ store.homeTeam.record.find((team) => team.type == 'ytd').displayValue }}
+        {{ store.homeTeam.record.find((team) => team.type == 'total').displayValue }}
       </p>
     </div>
     <div class="venue">
