@@ -21,11 +21,18 @@
         <p class="medium light">{{ $filters.moment(store.competition.date, 'dddd') }}</p>
         <p class="small light">{{ $filters.moment(store.competition.date, 'h:mm A') }}</p>
       </div>
-      <div class="large light" v-if="store.competition.status.type.state != 'pre'">
+      <div
+        class="large light"
+        v-if="
+          store.competition.status.type.state != 'pre' &&
+          store.awayTeam.score &&
+          store.homeTeam.score
+        "
+      >
         {{ store.awayTeam.score.displayValue }} - {{ store.homeTeam.score.displayValue }}
       </div>
-      <p class="medium light upper" v-if="store.competition.status.type.state != 'pre'">
-        {{ store.competition.status.type.detail }}
+      <p class="small thin upper" v-if="store.competition.status.type.state != 'pre'">
+        {{ store.competition.status.type.shortDetail }}
       </p>
     </div>
     <div class="home">
