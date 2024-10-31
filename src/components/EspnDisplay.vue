@@ -3,7 +3,7 @@
     <div class="name">
       <p class="small light upper">{{ store.event.name }}</p>
       <p class="xsmall thin">
-        updates {{ $filters.duration(store.refreshInterval) }}
+        update {{ $filters.duration(store.refreshInterval) }}
         <span v-if="lastUpdate">| updated {{ lastUpdate }}</span>
       </p>
     </div>

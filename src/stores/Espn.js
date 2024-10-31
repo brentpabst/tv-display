@@ -28,24 +28,35 @@ export const useEspnStore = defineStore('espn', {
         )
     },
     refreshInterval: (state) => {
+      const preGameInterval = 900000 // 15 minutes
+      const preGameCloseInterval = 30000 // 30 seconds
+      const inGameInterval = 15000 // 15 seconds
+      const postGameInterval = 3600000 // 1 hour
+
+      let eventTime = moment(state.event.date).subtract(15, 'minutes')
+
       if (!state.competition) {
         console.log('No Event Scheduled')
-        return 3600000 // 30 minutes
+        return postGameInterval
       }
-      if (
+
+      if (state.competition.status.type.state == 'pre' && moment().isSameOrAfter(eventTime)) {
+        console.log('Event Scheduled & Starts Soon')
+        return preGameCloseInterval
+      } else if (state.competition.status.type.state == 'pre') {
+        console.log('Event Scheduled')
+        return preGameInterval
+      } else if (
         state.competition.status.type.state == 'in' ||
         (moment().isSameOrAfter(state.competition.date) &&
           state.competition.status.type.state != 'post')
       ) {
         console.log('Event in Progress')
-        return 15000 // 15 seconds
-      } else if (state.competition.status.type.state == 'pre') {
-        console.log('Event Scheduled')
-        return 900000 // 15 minutes
+        return inGameInterval
       } else if (state.competition.status.type.state == 'post') {
         console.log('Event Complete')
-        return 3600000 // 1 hour
-      } else return 3600000 // 1 hour
+        return postGameInterval
+      } else return postGameInterval
     }
   },
   actions: {
