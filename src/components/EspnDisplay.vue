@@ -3,8 +3,8 @@
     <div class="name">
       <p class="small light upper">{{ store.event.name }}</p>
       <p class="xsmall thin">
-        updates {{ $filters.duration(store.refreshInterval) }} | updated
-        {{ $filters.timeagoUnix(store.last_update) }}
+        updates {{ $filters.duration(store.refreshInterval) }}
+        <span v-if="lastUpdate">| updated {{ lastUpdate }}</span>
       </p>
     </div>
     <div class="away">
@@ -54,6 +54,30 @@
   </div>
 </template>
 
+<script setup>
+import { ref } from 'vue'
+import { useEspnStore } from '@/stores/Espn'
+import moment from 'moment'
+
+const store = useEspnStore()
+store.getData()
+
+const lastUpdate = ref()
+
+setInterval(() => {
+  lastUpdate.value = moment(store.last_update).fromNow()
+}, 1000)
+
+let interval = 10000
+let loop = setInterval(() => {
+  clearInterval(loop)
+  store.getData()
+  loop = setInterval(() => {
+    store.getData()
+  }, store.refreshInterval)
+}, interval)
+</script>
+
 <style scoped>
 .scoreboard {
   background-color: var(--background-blur);
@@ -99,20 +123,3 @@
   max-width: 6rem;
 }
 </style>
-
-<script setup>
-import { useEspnStore } from '@/stores/Espn'
-
-const store = useEspnStore()
-store.getData()
-
-let interval = 10000
-let loop = setInterval(() => {
-  clearInterval(loop)
-  store.getData()
-  loop = setInterval(() => {
-    console.log(store.refreshInterval)
-    store.getData()
-  }, store.refreshInterval)
-}, interval)
-</script>

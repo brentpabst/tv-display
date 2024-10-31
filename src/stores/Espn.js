@@ -55,7 +55,7 @@ export const useEspnStore = defineStore('espn', {
           .then((response) => response.json())
           .then((data) => {
             this.event = Object.assign(this.event, data.team.nextEvent[0])
-            this.last_update = moment().unix()
+            this.last_update = new Date()
           })
       } catch (error) {
         console.error(error)
