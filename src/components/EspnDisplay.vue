@@ -13,7 +13,10 @@
         {{ store.awayTeam.team.shortDisplayName }}
       </p>
       <p class="small" v-if="store.awayTeam.record">
-        {{ store.awayTeam.record.find((team) => team.type == 'total').displayValue }}
+        {{
+          store.awayTeam.record.find((team) => team.type == 'total' || team.type == 'ytd')
+            .displayValue
+        }}
       </p>
     </div>
     <div class="info">
@@ -42,7 +45,10 @@
         {{ store.homeTeam.team.shortDisplayName }}
       </p>
       <p class="small" v-if="store.homeTeam.record">
-        {{ store.homeTeam.record.find((team) => team.type == 'total').displayValue }}
+        {{
+          store.homeTeam.record.find((team) => team.type == 'total' || team.type == 'ytd')
+            .displayValue
+        }}
       </p>
     </div>
     <div class="venue">
