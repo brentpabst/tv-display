@@ -34,6 +34,7 @@
       >
         {{ store.awayTeam.score.displayValue }} - {{ store.homeTeam.score.displayValue }}
       </div>
+      <div class="large light" v-else-if="store.competition.status.type.state == 'pre'"></div>
       <div class="large light" v-else>0 - 0</div>
       <p class="small thin upper" v-if="store.competition.status.type.state != 'pre'">
         {{ store.competition.status.type.shortDetail }}
