@@ -19,10 +19,10 @@
 .main {
   display: flex;
   flex: 1;
-  margin-top: calc(2rem + 0.390625vw);
-  margin-top: calc(2rem + 0.390625vw);
-  margin-left: calc(4rem + 0.390625vw);
-  margin-right: calc(4rem + 0.390625vw);
+  margin-top: calc(1rem + 0.390625vw);
+  margin-top: calc(1rem + 0.390625vw);
+  margin-left: calc(2rem + 0.390625vw);
+  margin-right: calc(2rem + 0.390625vw);
 }
 
 .left > div:not(:last-child),

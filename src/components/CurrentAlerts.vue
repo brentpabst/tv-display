@@ -1,11 +1,11 @@
 <template>
   <div class="alerts" v-if="store.alerts.length !== 0 && store.last_update != null">
     <div>
-      <VueFeather type="alert-octagon" size="3.8rem" stroke-width="1" class="pulse"></VueFeather>
+      <VueFeather type="alert-octagon" size="3rem" stroke-width="1"></VueFeather>
     </div>
     <div class="messages">
       <div v-for="alert in store.alerts" :key="alert.id" class="message">
-        <span class="large">{{ alert.properties.event }}</span>
+        <span class="medium">{{ alert.properties.event }}</span>
         <div class="small thin">
           <span class="upper">expires {{ $filters.timeago(alert.properties.expires) }}</span>
         </div>
@@ -28,7 +28,7 @@ setInterval(() => store.getAlerts(), 1000 * 60)
   gap: 1em;
   align-items: stretch;
   background-color: rgba(255, 0, 0, 0.75);
-  padding: 2em 4em;
+  padding: 1em 2em;
 }
 
 .messages {
