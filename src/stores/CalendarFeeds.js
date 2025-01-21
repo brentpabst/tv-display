@@ -27,7 +27,7 @@ export const useCalendarFeedsStore = defineStore('calendarFeeds', {
               array.push({
                 start: ev.start,
                 end: ev.end,
-                summary: typeof ev.summary === 'object' ? ev.summary.params.val : ev.summary,
+                summary: typeof ev.summary === 'object' ? ev.summary.val : ev.summary,
                 description: ev.description,
                 location: ev.location,
                 duration: parseInt(moment(ev.end).format('x') - moment(ev.start).format('x'))
