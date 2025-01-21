@@ -23,10 +23,11 @@ export const useCalendarFeedsStore = defineStore('calendarFeeds', {
           if (Object.prototype.hasOwnProperty.call(data, k)) {
             var ev = data[k]
             if (data[k].type == 'VEVENT') {
+              console.log(ev.summary)
               array.push({
                 start: ev.start,
                 end: ev.end,
-                summary: ev.summary,
+                summary: typeof ev.summary === 'object' ? ev.summary.params.val : ev.summary,
                 description: ev.description,
                 location: ev.location,
                 duration: parseInt(moment(ev.end).format('x') - moment(ev.start).format('x'))
