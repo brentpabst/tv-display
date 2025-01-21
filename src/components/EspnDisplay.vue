@@ -21,7 +21,7 @@
     </div>
     <div class="info">
       <div v-if="store.competition.status.type.state == 'pre'">
-        <p class="medium light">{{ $filters.moment(store.competition.date, 'dddd') }}</p>
+        <p class="medium light">{{ $filters.momentCalendar(store.competition.date) }}</p>
         <p class="small light">{{ $filters.moment(store.competition.date, 'h:mm A') }}</p>
       </div>
       <div

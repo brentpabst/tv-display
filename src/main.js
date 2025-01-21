@@ -29,6 +29,15 @@ app.config.globalProperties.$filters = {
       sameElse: 'ddd'
     })
   },
+  momentCalendar(date) {
+    return moment(date).calendar({
+      sameDay: '[Today]',
+      nextDay: '[Tomorrow]',
+      lastDay: '[Yesterday]',
+      nextWeek: 'D',
+      sameElse: 'D'
+    })
+  },
   timeagoUnix(date) {
     return moment.unix(date).fromNow()
   },
