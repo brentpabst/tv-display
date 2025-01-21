@@ -23,7 +23,6 @@ export const useCalendarFeedsStore = defineStore('calendarFeeds', {
           if (Object.prototype.hasOwnProperty.call(data, k)) {
             var ev = data[k]
             if (data[k].type == 'VEVENT') {
-              console.log(ev.summary)
               array.push({
                 start: ev.start,
                 end: ev.end,
