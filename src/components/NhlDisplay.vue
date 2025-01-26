@@ -26,14 +26,14 @@
         <div class="large light" v-else-if="store.event.gameState == 'OFF'">Final</div>
         <div v-else>
           <div v-if="store.event.clock && !store.event.clock.inIntermission">
-            <p>
+            <p class="medium thin">
               <VueFeather
                 v-if="store.event.clock.running"
                 type="rotate-cw"
                 animation="spin"
-                size=".8rem"
+                size="1rem"
               />
-              <VueFeather v-if="!store.event.clock.running" type="clock" size=".8rem" />
+              <VueFeather v-if="!store.event.clock.running" type="clock" size="1rem" />
               {{ store.event.clock.timeRemaining }}
             </p>
             <p class="xsmall upper thin">
@@ -61,7 +61,7 @@
         </div>
         <div class="sog">
           <p class="xxsmall thin upper">Shots on Goal</p>
-          <p class="medium light">
+          <p class="small">
             {{ store.event.awayTeam.sog || 0 }} - {{ store.event.homeTeam.sog || 0 }}
           </p>
         </div>
