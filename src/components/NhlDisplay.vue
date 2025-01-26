@@ -89,6 +89,21 @@
         {{ store.event.tvBroadcasts.map((broadcast) => broadcast.network).join(', ') }}
       </p>
     </div>
+    <div class="next" v-if="store.nextGame && store.event.gameState != 'FUT'">
+      <p class="xsmall upper">Next Game</p>
+      <p class="xsmall thin">
+        {{
+          store.nextGame.awayTeam.commonName.default +
+          ' @ ' +
+          store.nextGame.homeTeam.commonName.default
+        }},
+        {{
+          $filters.momentCalendar(store.nextGame.startTimeUTC) +
+          ' @ ' +
+          $filters.moment(store.event.startTimeUTC, 'h:mm A')
+        }}
+      </p>
+    </div>
   </div>
 </template>
 
@@ -126,7 +141,8 @@ let loop = setInterval(() => {
   grid-template-areas:
     'name name name'
     'away info home'
-    'venue empty broadcasts';
+    'venue empty broadcasts'
+    'next next next';
   grid-auto-columns: 1fr;
   align-items: center;
 }
@@ -155,6 +171,10 @@ let loop = setInterval(() => {
   grid-area: broadcasts;
   align-self: start;
   text-align: right;
+}
+.next {
+  grid-area: next;
+  text-align: center;
 }
 
 .logo {

@@ -7,11 +7,20 @@ const nhl_car_game_url = proxy_url + 'https://api-web.nhle.com/v1/gamecenter/'
 
 export const useNhlStore = defineStore('nhl', {
   state: () => ({
-    cur_gameId: null,
+    currentGameId: null,
+    schedule: {},
     event: {},
     last_update: null
   }),
   getters: {
+    nextGame: (state) => {
+      let next = state.schedule[1]
+      if (next) {
+        return next
+      } else {
+        return null
+      }
+    },
     currentPeriod: (state) => {
       if (!state.event.periodDescriptor) {
         return
@@ -62,8 +71,9 @@ export const useNhlStore = defineStore('nhl', {
         await fetch(nhl_car_schedule_url)
           .then((response) => response.json())
           .then(async (data) => {
-            this.cur_gameId = data.games[0].id
-            fetch(nhl_car_game_url + this.cur_gameId + '/landing')
+            this.schedule = data.games
+            this.currentGameId = data.games[0].id
+            fetch(nhl_car_game_url + this.currentGameId + '/landing')
               .then((response) => response.json())
               .then((data) => {
                 this.event = data

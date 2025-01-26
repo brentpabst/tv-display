@@ -34,8 +34,8 @@ app.config.globalProperties.$filters = {
       sameDay: '[Today]',
       nextDay: '[Tomorrow]',
       lastDay: '[Yesterday]',
-      nextWeek: 'D',
-      sameElse: 'D'
+      nextWeek: 'dddd',
+      sameElse: 'dddd'
     })
   },
   timeagoUnix(date) {
