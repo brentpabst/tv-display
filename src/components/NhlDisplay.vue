@@ -19,37 +19,53 @@
         {{ store.event.awayTeam.record }}
       </p>
     </div>
-
     <div class="info">
+      <div>
+        <div class="large light" v-if="store.event.gameState == 'FUT'">Scheduled</div>
+        <div class="large light" v-else-if="store.event.gameState == 'PRE'">Pregame</div>
+        <div class="large light" v-else-if="store.event.gameState == 'OFF'">Final</div>
+        <div v-else>
+          <div v-if="store.event.clock && !store.event.clock.inIntermission">
+            <p>
+              <VueFeather
+                v-if="store.event.clock.running"
+                type="rotate-cw"
+                animation="spin"
+                size=".8rem"
+              />
+              <VueFeather v-if="!store.event.clock.running" type="clock" size=".8rem" />
+              {{ store.event.clock.timeRemaining }}
+            </p>
+            <p class="xsmall upper thin">
+              {{ store.currentPeriod }}
+            </p>
+          </div>
+          <div v-else>
+            <p>{{ store.currentPeriod }}</p>
+            <p>
+              <VueFeather type="rotate-cw" animation="spin" size=".8rem" />
+              {{ store.event.clock.timeRemaining }}
+            </p>
+          </div>
+        </div>
+      </div>
       <div v-if="store.event.gameState == 'FUT'">
         <p class="medium light">{{ $filters.momentCalendar(store.event.startTimeUTC) }}</p>
         <p class="small light">
           {{ $filters.moment(store.event.startTimeUTC, 'h:mm A') }}
         </p>
       </div>
-      <div
-        class="large light"
-        v-if="
-          store.event.gameState != 'FUT' && store.event.awayTeam.score && store.event.homeTeam.score
-        "
-      >
-        {{ store.event.awayTeam.score }} - {{ store.event.homeTeam.score }}
+      <div v-if="store.event.gameState == 'LIVE'">
+        <div class="large light">
+          {{ store.event.awayTeam.score }} - {{ store.event.homeTeam.score }}
+        </div>
+        <div class="sog">
+          <p class="xxsmall thin upper">Shots on Goal</p>
+          <p class="medium light">
+            {{ store.event.awayTeam.sog || 0 }} - {{ store.event.homeTeam.sog || 0 }}
+          </p>
+        </div>
       </div>
-      <div class="large light" v-else-if="store.event.gameState == 'FUT'"></div>
-      <div class="large light" v-else>0 - 0</div>
-      <p class="small thin upper" v-if="store.event.gameState != 'FUT'">
-        <span v-if="!store.event.clock.isIntermission">
-          <VueFeather type="clock" size="1rem" stroke-width="1" />
-          <VueFeather
-            v-if="store.event.clock && store.event.clock.isRunning"
-            type="refresh-cw"
-            animation="spin"
-            size="1rem"
-          />
-          {{ store.event.clock.timeRemaining }}
-        </span>
-        <span v-else>Intermission</span>
-      </p>
     </div>
     <div class="home">
       <img class="logo" :src="store.event.homeTeam.darkLogo" />
@@ -143,5 +159,11 @@ let loop = setInterval(() => {
 
 .logo {
   max-width: 6rem;
+}
+
+.sog {
+  border: solid 1px white;
+  margin-top: 0.5em;
+  padding: 0.2em;
 }
 </style>

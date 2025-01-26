@@ -12,6 +12,19 @@ export const useNhlStore = defineStore('nhl', {
     last_update: null
   }),
   getters: {
+    currentPeriod: (state) => {
+      if (!state.event.periodDescriptor) {
+        return
+      } else {
+        const suffixes = ['th', 'st', 'nd', 'rd']
+        const v = state.event.periodDescriptor.number % 100
+        let ordinal =
+          state.event.periodDescriptor.number +
+          (suffixes[(v - 20) % 10] || suffixes[v] || suffixes[0])
+        let period = state.event.clock.inIntermission ? ' Int' : ' Period'
+        return ordinal + period
+      }
+    },
     refreshInterval: (state) => {
       const preGameInterval = 900000 // 15 minutes
       const preGameCloseInterval = 30000 // 30 seconds
