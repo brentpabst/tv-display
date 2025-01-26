@@ -84,22 +84,36 @@
         {{ store.event.homeTeam.record }}
       </p>
     </div>
-    <div class="venue">
+    <div class="venue" v-if="store.event.gameState != 'FINAL'">
       <p class="xsmall upper">Venue</p>
       <p class="small">{{ store.event.venue.default }}</p>
       <p class="xsmall light">
         {{ store.event.venueLocation.default }}
       </p>
     </div>
-    <div class="broadcasts">
+    <div class="broadcasts" v-if="store.event.gameState != 'FINAL'">
       <p class="xsmall upper">Broadcasts</p>
       <p class="xsmall light">
         {{ store.event.tvBroadcasts.map((broadcast) => broadcast.network).join(', ') }}
       </p>
     </div>
     <div class="next" v-if="store.nextGame && store.event.gameState != 'FUT'">
-      <p class="xsmall upper">Next Game</p>
-      <p class="xsmall thin">
+      <p
+        class="upper"
+        :class="{
+          xsmall: store.event.gameState != 'FINAL',
+          small: store.event.gameState == 'FINAL'
+        }"
+      >
+        Next Game
+      </p>
+      <p
+        class="thin"
+        :class="{
+          xsmall: store.event.gameState != 'FINAL',
+          small: store.event.gameState == 'FINAL'
+        }"
+      >
         {{
           store.nextGame.awayTeam.commonName.default +
           ' @ ' +
