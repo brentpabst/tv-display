@@ -41,11 +41,11 @@
             </p>
           </div>
           <div v-else>
-            <p>{{ store.currentPeriod }}</p>
             <p>
               <VueFeather type="rotate-cw" animation="spin" size=".8rem" />
               {{ store.event.clock.timeRemaining }}
             </p>
+            <p class="xsmall upper thin">{{ store.currentPeriod }}</p>
           </div>
         </div>
       </div>

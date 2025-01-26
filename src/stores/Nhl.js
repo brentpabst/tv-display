@@ -21,7 +21,7 @@ export const useNhlStore = defineStore('nhl', {
         let ordinal =
           state.event.periodDescriptor.number +
           (suffixes[(v - 20) % 10] || suffixes[v] || suffixes[0])
-        let period = state.event.clock.inIntermission ? ' Int' : ' Period'
+        let period = state.event.clock.inIntermission ? ' Intermission' : ' Period'
         return ordinal + period
       }
     },
