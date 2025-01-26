@@ -21,12 +21,19 @@
     </div>
     <div class="info">
       <div>
-        <div class="medium light upper" v-if="store.event.gameState == 'FUT'">Scheduled</div>
-        <div class="medium light upper" v-else-if="store.event.gameState == 'PRE'">Pregame</div>
-        <div class="medium light upper" v-else-if="store.event.gameState == 'FINAL'">
+        <div
+          class="medium light upper"
+          v-if="store.event.gameState == 'FINAL' || store.event.gameState == 'OFF'"
+        >
           Final{{ store.event.periodDescriptor.periodType == 'OT' ? '/OT' : '' }}
         </div>
-        <div v-else>
+        <div
+          v-else-if="
+            store.event.gameState == 'LIVE' ||
+            store.event.gameState == 'CRIT' ||
+            store.event.gameState == 'PRE'
+          "
+        >
           <div v-if="store.event.clock && !store.event.clock.inIntermission">
             <p class="medium thin">
               <VueFeather
@@ -61,7 +68,8 @@
         v-if="
           store.event.gameState == 'LIVE' ||
           store.event.gameState == 'CRIT' ||
-          store.event.gameState == 'FINAL'
+          store.event.gameState == 'FINAL' ||
+          store.event.gameState == 'OFF'
         "
       >
         <div class="large light">
@@ -84,14 +92,17 @@
         {{ store.event.homeTeam.record }}
       </p>
     </div>
-    <div class="venue" v-if="store.event.gameState != 'FINAL'">
+    <div class="venue" v-if="store.event.gameState != 'FINAL' || store.event.gameState != 'OFF'">
       <p class="xsmall upper">Venue</p>
       <p class="small">{{ store.event.venue.default }}</p>
       <p class="xsmall light">
         {{ store.event.venueLocation.default }}
       </p>
     </div>
-    <div class="broadcasts" v-if="store.event.gameState != 'FINAL'">
+    <div
+      class="broadcasts"
+      v-if="store.event.gameState != 'FINAL' || store.event.gameState != 'OFF'"
+    >
       <p class="xsmall upper">Broadcasts</p>
       <p class="xsmall light">
         {{ store.event.tvBroadcasts.map((broadcast) => broadcast.network).join(', ') }}
