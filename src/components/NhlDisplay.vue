@@ -21,9 +21,11 @@
     </div>
     <div class="info">
       <div>
-        <div class="large light" v-if="store.event.gameState == 'FUT'">Scheduled</div>
-        <div class="large light" v-else-if="store.event.gameState == 'PRE'">Pregame</div>
-        <div class="large light" v-else-if="store.event.gameState == 'OFF'">Final</div>
+        <div class="medium light upper" v-if="store.event.gameState == 'FUT'">Scheduled</div>
+        <div class="medium light upper" v-else-if="store.event.gameState == 'PRE'">Pregame</div>
+        <div class="medium light upper" v-else-if="store.event.gameState == 'FINAL'">
+          Final{{ store.event.periodDescriptor.periodType == 'OT' ? '/OT' : '' }}
+        </div>
         <div v-else>
           <div v-if="store.event.clock && !store.event.clock.inIntermission">
             <p class="medium thin">
@@ -55,11 +57,17 @@
           {{ $filters.moment(store.event.startTimeUTC, 'h:mm A') }}
         </p>
       </div>
-      <div v-if="store.event.gameState == 'LIVE' || store.event.gameState == 'CRIT'">
+      <div
+        v-if="
+          store.event.gameState == 'LIVE' ||
+          store.event.gameState == 'CRIT' ||
+          store.event.gameState == 'FINAL'
+        "
+      >
         <div class="large light">
           {{ store.event.awayTeam.score }} - {{ store.event.homeTeam.score }}
         </div>
-        <div class="sog">
+        <div class="sog" v-if="store.event.gameState == 'LIVE' || store.event.gameState == 'CRIT'">
           <p class="xxsmall thin upper">Shots on Goal</p>
           <p class="small">
             {{ store.event.awayTeam.sog || 0 }} - {{ store.event.homeTeam.sog || 0 }}

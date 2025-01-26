@@ -26,12 +26,20 @@ export const useNhlStore = defineStore('nhl', {
         return
       } else {
         const suffixes = ['th', 'st', 'nd', 'rd']
-        const v = state.event.periodDescriptor.number % 100
-        let ordinal =
-          state.event.periodDescriptor.number +
-          (suffixes[(v - 20) % 10] || suffixes[v] || suffixes[0])
-        let period = state.event.clock.inIntermission ? ' Intermission' : ' Period'
-        return ordinal + period
+
+        if (state.event.periodDescriptor.number < 4) {
+          const v = state.event.periodDescriptor.number % 100
+          let ordinal =
+            state.event.periodDescriptor.number +
+            (suffixes[(v - 20) % 10] || suffixes[v] || suffixes[0])
+          let period = state.event.clock.inIntermission ? ' Intermission' : ' Period'
+          return ordinal + period
+        } else {
+          let period = state.event.periodDescriptor.number - 3
+          const v = period % 100
+          let ordinal = period + (suffixes[(v - 20) % 10] || suffixes[v] || suffixes[0])
+          return ordinal + ' Overtime'
+        }
       }
     },
     refreshInterval: (state) => {
@@ -53,14 +61,10 @@ export const useNhlStore = defineStore('nhl', {
       } else if (state.event.gameState == 'FUT') {
         console.log('Event Scheduled')
         return preGameInterval
-      } else if (
-        state.event.gameState == 'LIVE' ||
-        state.event.gameState == 'CRIT' ||
-        (moment().isSameOrAfter(eventTime) && state.event.gameState != 'OFF')
-      ) {
+      } else if (state.event.gameState == 'LIVE' || state.event.gameState == 'CRIT') {
         console.log('Event in Progress')
         return inGameInterval
-      } else if (state.event.gameState == 'OFF') {
+      } else if (state.event.gameState == 'OFF' || state.event.gameState == 'FINAL') {
         console.log('Event Complete')
         return postGameInterval
       } else return postGameInterval
