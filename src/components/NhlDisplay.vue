@@ -55,7 +55,7 @@
           {{ $filters.moment(store.event.startTimeUTC, 'h:mm A') }}
         </p>
       </div>
-      <div v-if="store.event.gameState == 'LIVE'">
+      <div v-if="store.event.gameState == 'LIVE' || store.event.gameState == 'CRIT'">
         <div class="large light">
           {{ store.event.awayTeam.score }} - {{ store.event.homeTeam.score }}
         </div>

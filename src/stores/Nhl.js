@@ -55,6 +55,7 @@ export const useNhlStore = defineStore('nhl', {
         return preGameInterval
       } else if (
         state.event.gameState == 'LIVE' ||
+        state.event.gameState == 'CRIT' ||
         (moment().isSameOrAfter(eventTime) && state.event.gameState != 'OFF')
       ) {
         console.log('Event in Progress')
