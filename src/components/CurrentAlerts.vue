@@ -8,6 +8,9 @@
         <span class="medium">{{ alert.properties.event }}</span>
         <div class="small thin">
           <span class="upper">expires {{ $filters.timeago(alert.properties.expires) }}</span>
+          <p class="description">
+            {{ alert.properties.description }}
+          </p>
         </div>
       </div>
     </div>
@@ -46,5 +49,12 @@ setInterval(() => store.getAlerts(), 1000 * 60)
 .messages > .message:first-child {
   padding: 0;
   padding-right: 1em;
+}
+
+.message .description {
+  width: 35ch;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
 }
 </style>
