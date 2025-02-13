@@ -138,6 +138,14 @@
       </p>
     </div>
   </div>
+  <div class="scoreboard" v-else>
+    <div class="name">
+      <p class="small light upper">Carolina Hurricanes Hockey</p>
+      <p class="xsmall thin">update {{ $filters.duration(store.refreshInterval) }}</p>
+      <img class="maxLogo" src="https://assets.nhle.com/logos/nhl/svg/CAR_dark.svg" />
+      <p class="small light upper">No Scheduled Games this Week</p>
+    </div>
+  </div>
 </template>
 
 <script setup>
@@ -212,6 +220,10 @@ let loop = setInterval(() => {
 
 .logo {
   max-width: 6rem;
+}
+
+.maxLogo {
+  max-width: 10rem;
 }
 
 .sog {

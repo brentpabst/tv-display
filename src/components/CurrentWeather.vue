@@ -19,6 +19,7 @@
       {{ store.weather.temp }}°
     </div>
     <div class="light">Feels like {{ store.weather.feels_like }}°</div>
+    <div v-if="store.error" class="light">Error Loading Weather!</div>
     <div class="light" v-if="store.weather.precipitation_type == 1">
       <VueFeather type="droplet" />{{ store.weather.rain_accumulated.toPrecision(2) }} inches of
       rain today

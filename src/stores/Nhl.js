@@ -77,13 +77,15 @@ export const useNhlStore = defineStore('nhl', {
           .then((response) => response.json())
           .then(async (data) => {
             this.schedule = data.games
-            this.currentGameId = data.games[0].id
-            fetch(nhl_car_game_url + this.currentGameId + '/landing')
-              .then((response) => response.json())
-              .then((data) => {
-                this.event = data
-                this.last_update = new Date()
-              })
+            if (data.games.length != 0) {
+              this.currentGameId = data.games[0].id
+              fetch(nhl_car_game_url + this.currentGameId + '/landing')
+                .then((response) => response.json())
+                .then((data) => {
+                  this.event = data
+                  this.last_update = new Date()
+                })
+            }
           })
       } catch (error) {
         console.error(error)

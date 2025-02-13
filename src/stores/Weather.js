@@ -44,7 +44,8 @@ export const useWeatherStore = defineStore('weather', {
     forecast: [],
     moon: null,
     sun: null,
-    socket: null
+    socket: null,
+    error: false
   }),
   actions: {
     initialize() {
@@ -67,8 +68,12 @@ export const useWeatherStore = defineStore('weather', {
       this.getForecast()
     },
     startWeatherFlow() {
+      this.error = false
       this.socket = new WebSocket(weatherflow_url)
       this.socket.onmessage = this.handleMessage
+      this.socket.onclose = this.handlerError
+      this.socket.onerror = this.handlerError
+
       this.socket.onopen = () => {
         this.socket.send(
           JSON.stringify({
@@ -99,6 +104,14 @@ export const useWeatherStore = defineStore('weather', {
       if (data.type == 'evt_strike') {
         this.weather = Object.assign(this.weather, parseStrike(data))
       }
+    },
+    handlerError(error) {
+      this.error = true
+      console.error('Socket encountered error: ', error.message, 'Attempting to reconnect...')
+      this.socket.close()
+      setTimeout(() => {
+        this.initialize()
+      }, 5000)
     },
     getSunCalcs(date, lat, lon) {
       let today = moment(date)
