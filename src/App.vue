@@ -12,7 +12,6 @@
     </v-offline>
     <div class="main">
       <div class="left">
-        TESTING
         <DigitalClock />
         <EventCalendar />
       </div>
