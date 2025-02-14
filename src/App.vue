@@ -90,7 +90,7 @@ export default {
           currentTag = response.headers.get('etag')
         }
       })
-    }, 2000)
+    }, 30000)
     return { online, onNetworkChange }
   },
   data() {
