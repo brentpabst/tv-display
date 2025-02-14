@@ -12,6 +12,7 @@
     </v-offline>
     <div class="main">
       <div class="left">
+        TESTING
         <DigitalClock />
         <EventCalendar />
       </div>
@@ -76,6 +77,21 @@ export default {
     const onNetworkChange = (isOnline) => {
       online.value = isOnline
     }
+
+    var currentTag = ''
+    window.setInterval(() => {
+      fetch(window.location.origin).then((response) => {
+        if (currentTag !== '') {
+          let newTag = response.headers.get('etag')
+          if (currentTag !== newTag) {
+            console.log('eTags are not the same, reloading page')
+            window.location.reload()
+          }
+        } else {
+          currentTag = response.headers.get('etag')
+        }
+      })
+    }, 2000)
     return { online, onNetworkChange }
   },
   data() {
