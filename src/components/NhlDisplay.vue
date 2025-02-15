@@ -143,7 +143,7 @@
       <p class="small light upper">Carolina Hurricanes Hockey</p>
       <p class="xsmall thin">update {{ $filters.duration(store.refreshInterval) }}</p>
       <img class="maxLogo" src="https://assets.nhle.com/logos/nhl/svg/CAR_dark.svg" />
-      <p class="small light upper">No Scheduled Games this Week</p>
+      <p class="small light upper">No Upcoming Games</p>
     </div>
   </div>
 </template>
