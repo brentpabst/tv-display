@@ -14,7 +14,22 @@ export default {
     options: {
       type: Object,
       default() {
-        return {}
+        return {
+          autoplay: true,
+          controls: false,
+          muted: true,
+          preload: 'auto',
+          loop: true,
+          fluid: true,
+          aspectRatio: '16:9',
+          responsive: true,
+          sources: [
+            {
+              src: 'https://media-hls.wral.com/livehttporigin/_definst_/mp4:north_hills_mall.stream/playlist.m3u8',
+              type: 'application/x-mpegURL'
+            }
+          ]
+        }
       }
     }
   },
@@ -33,6 +48,10 @@ export default {
   }
 }
 </script>
+
+<style>
+@import 'video.js/dist/video-js.css';
+</style>
 
 <style scoped>
 .player {

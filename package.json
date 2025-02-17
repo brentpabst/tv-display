@@ -13,7 +13,6 @@
   "dependencies": {
     "@fontsource/kalam": "^5.0.13",
     "@fontsource/roboto": "^5.0.14",
-    "@formkit/auto-animate": "^0.8.2",
     "convert-units": "^3.0.0-beta.6",
     "feather-icons": "^4.29.2",
     "ical": "^0.8.0",
@@ -22,9 +21,9 @@
     "ping.js": "^0.3.0",
     "pinia": "^2.2.2",
     "suncalc": "^1.9.0",
-    "v-offline": "^3.5.0",
     "vue": "^3.4.38",
-    "vue-feather": "^2.0.0"
+    "vue-feather": "^2.0.0",
+    "vue-router": "^4.5.0"
   },
   "devDependencies": {
     "@rushstack/eslint-patch": "^1.8.0",

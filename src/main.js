@@ -1,11 +1,10 @@
 import './assets/main.css'
 
 import { createApp } from 'vue'
+import router from '@/router/router'
 import { createPinia } from 'pinia'
 import moment from 'moment'
 import VueFeather from 'vue-feather'
-import { autoAnimatePlugin } from '@formkit/auto-animate/vue'
-import { VOffline } from 'v-offline'
 
 import App from './App.vue'
 
@@ -13,8 +12,8 @@ const pinia = createPinia()
 
 const app = createApp(App)
 
+app.use(router)
 app.use(pinia)
-app.use(autoAnimatePlugin)
 
 app.config.globalProperties.$filters = {
   momentUnix(date, format) {
@@ -53,6 +52,5 @@ app.config.globalProperties.$filters = {
 }
 
 app.component(VueFeather.name, VueFeather)
-app.component('VOffline', VOffline)
 
 app.mount('#app')

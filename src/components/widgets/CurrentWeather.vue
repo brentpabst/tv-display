@@ -84,7 +84,7 @@
 
 <script setup>
 import { onMounted, onUnmounted } from 'vue'
-import { useWeatherStore } from '@/stores/Weather'
+import { useWeatherStore } from '@/store/Weather'
 
 const store = useWeatherStore()
 store.initialize()

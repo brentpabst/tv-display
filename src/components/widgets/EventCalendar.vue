@@ -48,7 +48,7 @@
 
 <script setup>
 import { onMounted, onUnmounted } from 'vue'
-import { useCalendarFeedsStore } from '@/stores/CalendarFeeds'
+import { useCalendarFeedsStore } from '@/store/CalendarFeeds'
 
 const store = useCalendarFeedsStore()
 store.fetchFeeds()

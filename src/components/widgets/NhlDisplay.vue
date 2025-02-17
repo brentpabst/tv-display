@@ -150,7 +150,7 @@
 
 <script setup>
 import { ref } from 'vue'
-import { useNhlStore } from '@/stores/Nhl'
+import { useNhlStore } from '@/store/Nhl'
 import moment from 'moment'
 
 const store = useNhlStore()

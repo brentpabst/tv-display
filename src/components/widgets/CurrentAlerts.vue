@@ -18,7 +18,7 @@
 </template>
 
 <script setup>
-import { useNwsAlertStore } from '@/stores/NwsAlerts'
+import { useNwsAlertStore } from '@/store/NwsAlerts'
 
 const store = useNwsAlertStore()
 store.getAlerts()
