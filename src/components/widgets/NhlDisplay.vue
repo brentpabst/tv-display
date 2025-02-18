@@ -178,7 +178,7 @@ let loop = setInterval(() => {
   border-radius: 5px;
   padding: 0.8em 1em;
   display: grid;
-  gap: 1em;
+  gap: 0.2em;
   grid-template-areas:
     'name name name'
     'away info home'
