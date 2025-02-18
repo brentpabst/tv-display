@@ -9,7 +9,9 @@
         <div class="small thin">
           <span class="upper">expires {{ $filters.timeago(alert.properties.expires) }}</span>
           <p class="description">
-            {{ alert.properties.description }}
+            <marquee behavior="scroll" direction="left" scrollamount="10">
+              {{ alert.properties.description }}
+            </marquee>
           </p>
         </div>
       </div>
