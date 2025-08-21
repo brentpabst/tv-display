@@ -1,56 +1,21 @@
-import './assets/main.css'
-
 import { createApp } from 'vue'
-import router from '@/router/router'
 import { createPinia } from 'pinia'
-import moment from 'moment'
-import VueFeather from 'vue-feather'
-
+import { createPersistedState } from 'pinia-plugin-persistedstate'
+import './style.css'
 import App from './App.vue'
-
-const pinia = createPinia()
+import { setupNetworkMonitoring } from './utils/networkMonitor'
+import { useOfflineStateStore } from './stores/offlineState'
 
 const app = createApp(App)
+const pinia = createPinia()
 
-app.use(router)
+// Add persistence plugin
+pinia.use(createPersistedState())
+
 app.use(pinia)
 
-app.config.globalProperties.$filters = {
-  momentUnix(date, format) {
-    return moment.unix(date).format(format)
-  },
-  momentUnixCalendar(date) {
-    return moment.unix(date).calendar({
-      sameDay: '[Today]',
-      nextDay: '[Tomorrow]',
-      lastDay: '[Yesterday]',
-      nextWeek: 'ddd',
-      sameElse: 'ddd'
-    })
-  },
-  momentCalendar(date) {
-    return moment(date).calendar({
-      sameDay: '[Today]',
-      nextDay: '[Tomorrow]',
-      lastDay: '[Yesterday]',
-      nextWeek: 'dddd',
-      sameElse: 'dddd'
-    })
-  },
-  timeagoUnix(date) {
-    return moment.unix(date).fromNow()
-  },
-  moment(date, format) {
-    return moment(date).format(format)
-  },
-  timeago(date) {
-    return moment(date).fromNow()
-  },
-  duration(milliseconds) {
-    return moment.duration(milliseconds).humanize(true)
-  }
-}
-
-app.component(VueFeather.name, VueFeather)
+// Initialize offline system after Pinia is ready
+const offlineStore = useOfflineStateStore()
+setupNetworkMonitoring(offlineStore)
 
 app.mount('#app')
