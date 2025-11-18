@@ -24,7 +24,7 @@ jobs:
         with:
           fail_on_empty: false
           # Proxy configuration
-          envkey_VITE_PROXY_ENABLED: ${{ secrets.VITE_PROXY_ENABLED }}
+          envkey_VITE_PROXY_ENABLED: true
           envkey_VITE_PROXY_URL: ${{ secrets.VITE_PROXY_URL }}
           # Location settings
           envkey_VITE_LOCATION_LATITUDE: ${{ secrets.VITE_LOCATION_LATITUDE }}
