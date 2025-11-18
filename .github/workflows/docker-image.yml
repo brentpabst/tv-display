@@ -22,15 +22,59 @@ jobs:
       - name: Create .env file
         uses: SpicyPizza/create-envfile@v2.0.3
         with:
-          fail_on_empty: true
-          envkey_VITE_CORS_PROXY_URL: ${{ secrets.VITE_CORS_PROXY_URL }}
-          envkey_VITE_LATITUDE: ${{ secrets.VITE_LATITUDE }}
-          envkey_VITE_LONGITUDE: ${{ secrets.VITE_LONGITUDE }}
-          envkey_VITE_WEATHERFLOW_TOKEN: ${{ secrets.VITE_WEATHERFLOW_TOKEN }}
-          envkey_VITE_WEATHERFLOW_STATION_ID: ${{ secrets.VITE_WEATHERFLOW_STATION_ID }}
+          fail_on_empty: false
+          # Proxy configuration
+          envkey_VITE_PROXY_ENABLED: ${{ secrets.VITE_PROXY_ENABLED }}
+          envkey_VITE_PROXY_URL: ${{ secrets.VITE_PROXY_URL }}
+          # Location settings
+          envkey_VITE_LOCATION_LATITUDE: ${{ secrets.VITE_LOCATION_LATITUDE }}
+          envkey_VITE_LOCATION_LONGITUDE: ${{ secrets.VITE_LOCATION_LONGITUDE }}
+          # Weatherflow API configuration
           envkey_VITE_WEATHERFLOW_DEVICE_ID: ${{ secrets.VITE_WEATHERFLOW_DEVICE_ID }}
-          envkey_VITE_ICAL_SYNC_INTERVAL: ${{ secrets.VITE_ICAL_SYNC_INTERVAL }}
-          envkey_VITE_ICAL_FEED_URLS: ${{ secrets.VITE_ICAL_FEED_URLS }}
+          envkey_VITE_WEATHERFLOW_STATION_ID: ${{ secrets.VITE_WEATHERFLOW_STATION_ID }}
+          envkey_VITE_WEATHERFLOW_ACCESS_TOKEN: ${{ secrets.VITE_WEATHERFLOW_ACCESS_TOKEN }}
+          envkey_VITE_WEATHERFLOW_TEMPERATURE_UNIT: ${{ secrets.VITE_WEATHERFLOW_TEMPERATURE_UNIT }}
+          envkey_VITE_WEATHERFLOW_WIND_UNIT: ${{ secrets.VITE_WEATHERFLOW_WIND_UNIT }}
+          envkey_VITE_WEATHERFLOW_PRESSURE_UNIT: ${{ secrets.VITE_WEATHERFLOW_PRESSURE_UNIT }}
+          envkey_VITE_WEATHERFLOW_PRECIPITATION_UNIT: ${{ secrets.VITE_WEATHERFLOW_PRECIPITATION_UNIT }}
+          # Video configuration
+          envkey_VITE_VIDEO_SOURCES: ${{ secrets.VITE_VIDEO_SOURCES }}
+          envkey_VITE_VIDEO_RETRY_MAX_RETRIES: ${{ secrets.VITE_VIDEO_RETRY_MAX_RETRIES }}
+          envkey_VITE_VIDEO_RETRY_BASE_DELAY: ${{ secrets.VITE_VIDEO_RETRY_BASE_DELAY }}
+          envkey_VITE_VIDEO_RETRY_MAX_DELAY: ${{ secrets.VITE_VIDEO_RETRY_MAX_DELAY }}
+          envkey_VITE_VIDEO_RETRY_LOAD_TIMEOUT: ${{ secrets.VITE_VIDEO_RETRY_LOAD_TIMEOUT }}
+          # Logging configuration
+          envkey_VITE_LOGGING_LEVEL: ${{ secrets.VITE_LOGGING_LEVEL }}
+          envkey_VITE_LOGGING_ENABLE_CONSOLE: ${{ secrets.VITE_LOGGING_ENABLE_CONSOLE }}
+          # Calendar feeds (up to 5 feeds)
+          envkey_VITE_CALENDAR_FEED_1_ENABLED: ${{ secrets.VITE_CALENDAR_FEED_1_ENABLED }}
+          envkey_VITE_CALENDAR_FEED_1_COLOR: ${{ secrets.VITE_CALENDAR_FEED_1_COLOR }}
+          envkey_VITE_CALENDAR_FEED_1_NAME: ${{ secrets.VITE_CALENDAR_FEED_1_NAME }}
+          envkey_VITE_CALENDAR_FEED_1_URL: ${{ secrets.VITE_CALENDAR_FEED_1_URL }}
+          envkey_VITE_CALENDAR_FEED_2_ENABLED: ${{ secrets.VITE_CALENDAR_FEED_2_ENABLED }}
+          envkey_VITE_CALENDAR_FEED_2_COLOR: ${{ secrets.VITE_CALENDAR_FEED_2_COLOR }}
+          envkey_VITE_CALENDAR_FEED_2_NAME: ${{ secrets.VITE_CALENDAR_FEED_2_NAME }}
+          envkey_VITE_CALENDAR_FEED_2_URL: ${{ secrets.VITE_CALENDAR_FEED_2_URL }}
+          envkey_VITE_CALENDAR_FEED_3_ENABLED: ${{ secrets.VITE_CALENDAR_FEED_3_ENABLED }}
+          envkey_VITE_CALENDAR_FEED_3_COLOR: ${{ secrets.VITE_CALENDAR_FEED_3_COLOR }}
+          envkey_VITE_CALENDAR_FEED_3_NAME: ${{ secrets.VITE_CALENDAR_FEED_3_NAME }}
+          envkey_VITE_CALENDAR_FEED_3_URL: ${{ secrets.VITE_CALENDAR_FEED_3_URL }}
+          # WiFi configuration
+          envkey_VITE_WIFI_SSID: ${{ secrets.VITE_WIFI_SSID }}
+          envkey_VITE_WIFI_SECURITY: ${{ secrets.VITE_WIFI_SECURITY }}
+          # Weather alerts configuration
+          envkey_VITE_WEATHER_ALERTS_LOAD_SAMPLE: ${{ secrets.VITE_WEATHER_ALERTS_LOAD_SAMPLE }}
+          # Transit times configuration
+          envkey_VITE_GOOGLE_MAPS_API_KEY: ${{ secrets.VITE_GOOGLE_MAPS_API_KEY }}
+          envkey_VITE_TRANSIT_ORIGIN: ${{ secrets.VITE_TRANSIT_ORIGIN }}
+          envkey_VITE_TRANSIT_DESTINATION_1_ENABLED: true
+          envkey_VITE_TRANSIT_DESTINATION_1_ID: ${{ secrets.VITE_TRANSIT_DESTINATION_1_ID }}
+          envkey_VITE_TRANSIT_DESTINATION_1_NAME: ${{ secrets.VITE_TRANSIT_DESTINATION_1_NAME }}
+          envkey_VITE_TRANSIT_DESTINATION_1_ADDRESS: ${{ secrets.VITE_TRANSIT_DESTINATION_1_ADDRESS }}
+          envkey_VITE_TRANSIT_DESTINATION_2_ENABLED: true
+          envkey_VITE_TRANSIT_DESTINATION_2_ID: ${{ secrets.VITE_TRANSIT_DESTINATION_2_ID }}
+          envkey_VITE_TRANSIT_DESTINATION_2_NAME: ${{ secrets.VITE_TRANSIT_DESTINATION_2_NAME }}
+          envkey_VITE_TRANSIT_DESTINATION_2_ADDRESS: ${{ secrets.VITE_TRANSIT_DESTINATION_2_ADDRESS }}
       - name: 🏗️ Build
         run: npm run build
       - name: Set up QEMU
