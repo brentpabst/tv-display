@@ -252,7 +252,6 @@
       const date = parseISO(timeString)
       return format(date, formatStr)
     } catch (error) {
-      console.error(error)
       return 'Error'
     }
   }
