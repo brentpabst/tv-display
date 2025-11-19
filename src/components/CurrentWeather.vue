@@ -1,35 +1,37 @@
 <template>
   <div v-if="hasWeatherData" class="text-white">
     <!-- Main Current Weather Display -->
-    <div class="text-right mb-0">
+    <div class="text-right mb-4">
       <div class="flex items-center justify-end space-x-4">
         <Icon
           :icon="getWeatherIcon(currentConditions?.icon || 'clear')"
           class="w-24 h-24 text-white"
         />
-        <div
-          v-if="currentWeather?.temperature !== null"
-          class="text-8xl font-thin"
-        >
-          {{ formatNumber(currentWeather.temperature, 1) }}°
+        <div class="flex flex-col">
+          <div
+            v-if="currentWeather?.temperature !== null"
+            class="text-8xl font-thin text-right"
+          >
+            {{ formatNumber(currentWeather.temperature, 1) }}°
+          </div>
+          <div v-else class="w-32 h-32 bg-white/20 rounded animate-pulse ml-auto"></div>
+          
+          <!-- Feels Like - centered under temperature -->
+          <div class="mt-1 text-center">
+            <span
+              v-if="currentWeather?.feelsLike !== null"
+              class="inline-flex items-center space-x-2 text-xl"
+            >
+              <Icon icon="mdi:thermometer" class="w-5 h-5 text-white" />
+              <span>Feels like {{ formatNumber(currentWeather.feelsLike, 1) }}°</span>
+            </span>
+            <span
+              v-else
+              class="inline-block w-24 h-5 bg-white/20 rounded animate-pulse"
+            ></span>
+          </div>
         </div>
-        <div v-else class="w-32 h-32 bg-white/20 rounded animate-pulse"></div>
       </div>
-    </div>
-
-    <!-- Feels Like -->
-    <div class="text-right mb-4">
-      <span
-        v-if="currentWeather?.feelsLike !== null"
-        class="inline-flex items-center space-x-2 text-xl"
-      >
-        <Icon icon="mdi:thermometer" class="w-5 h-5 text-white" />
-        <span>Feels like {{ formatNumber(currentWeather.feelsLike, 1) }}°</span>
-      </span>
-      <span
-        v-else
-        class="inline-block w-24 h-5 bg-white/20 rounded animate-pulse"
-      ></span>
     </div>
 
     <!-- Lightning Alert -->
