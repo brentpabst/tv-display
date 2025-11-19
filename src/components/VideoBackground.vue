@@ -50,6 +50,9 @@
 
   const logger = createLogger('VideoBackground', { media: true })
 
+  // Feature flag: Set to false to disable reload and image swap functionality
+  const ENABLE_RELOAD_AND_IMAGE_SWAP = false
+
   const videoRef = ref(null)
   const imageRef = ref(null)
   const canvasRef = ref(null)
@@ -67,6 +70,13 @@
   // Listen for offline state changes
   const handleOfflineStateChange = event => {
     isOffline.value = event.detail.isOffline
+    if (!ENABLE_RELOAD_AND_IMAGE_SWAP) {
+      logger.info(
+        `🎬 [VideoBackground] Offline state changed: ${isOffline.value} (reload disabled)`
+      )
+      return
+    }
+
     if (isOffline.value) {
       logger.info(
         '🎬 [VideoBackground] Offline detected, stopping video retry attempts'
@@ -121,6 +131,11 @@
 
   // Handle video errors and switch to backup image
   const handleVideoError = () => {
+    if (!ENABLE_RELOAD_AND_IMAGE_SWAP) {
+      logger.warn('Video failed to load (reload and image swap disabled)')
+      return
+    }
+
     logger.warn('Video failed to load, switching to backup image')
     logger.debug('Current retry count:', retryCount)
     logger.debug('Max retries:', retryConfig.maxRetries)
@@ -133,6 +148,11 @@
 
   // Handle video playing event - hide backup image when video actually starts
   const handleVideoPlaying = () => {
+    if (!ENABLE_RELOAD_AND_IMAGE_SWAP) {
+      logger.media('Video started playing')
+      return
+    }
+
     logger.media('Video started playing, hiding backup image')
     showBackupImage.value = false
     isAttemptingRestore = false // Reset the restore attempt flag
@@ -156,6 +176,11 @@
 
   // Handle video pause event - show backup image if video stops unexpectedly
   const handleVideoPause = () => {
+    if (!ENABLE_RELOAD_AND_IMAGE_SWAP) {
+      logger.media('Video paused')
+      return
+    }
+
     logger.media('Video paused unexpectedly')
     // Only show backup image if this wasn't a user-initiated pause
     if (!showBackupImage.value) {
@@ -166,12 +191,22 @@
 
   // Handle video ended event - show backup image when video ends
   const handleVideoEnded = () => {
+    if (!ENABLE_RELOAD_AND_IMAGE_SWAP) {
+      logger.media('Video ended')
+      return
+    }
+
     logger.media('Video ended, showing backup image')
     showBackupImage.value = true
   }
 
   // Retry video loading with exponential backoff
   const retryVideo = () => {
+    if (!ENABLE_RELOAD_AND_IMAGE_SWAP) {
+      logger.info('🎬 [VideoBackground] Video retry disabled')
+      return
+    }
+
     const browserOffline =
       typeof navigator !== 'undefined' && navigator.onLine === false
     if (isOffline.value && browserOffline) {
@@ -211,6 +246,11 @@
 
   // Start periodic checking for video availability
   const startPeriodicVideoCheck = () => {
+    if (!ENABLE_RELOAD_AND_IMAGE_SWAP) {
+      logger.debug('🎬 [VideoBackground] Periodic video check disabled')
+      return
+    }
+
     if (videoCheckInterval) {
       clearInterval(videoCheckInterval)
     }
@@ -231,7 +271,7 @@
         // Don't hide backup image here - let the video playing event handle it
         initializeVideo()
       }
-    }, retryConfig.periodicCheckInterval)
+    }, retryConfig.periodicCheckInterval || 60000) // Default to 60 seconds if not configured
   }
 
   // Stop periodic checking
@@ -256,7 +296,7 @@
       }, 10000) // 10 second timeout
     }
 
-    if (Hls.isSupported()) {
+      if (Hls.isSupported()) {
       setupHls(video)
     } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
       setupNativeHls(video)
@@ -264,7 +304,9 @@
       logger.error(
         'HLS is not supported in this browser, switching to backup image'
       )
-      handleVideoError()
+      if (ENABLE_RELOAD_AND_IMAGE_SWAP) {
+        handleVideoError()
+      }
     }
   }
 
@@ -388,29 +430,43 @@
     hls.attachMedia(video)
 
     // Add timeout to switch to backup image if video doesn't load
-    const videoLoadTimeout = setTimeout(() => {
-      if (!showBackupImage.value) {
-        logger.warn('Video load timeout, attempting retry...')
-        retryVideo()
-      }
-    }, retryConfig.loadTimeout)
+    const videoLoadTimeout = ENABLE_RELOAD_AND_IMAGE_SWAP
+      ? setTimeout(() => {
+          if (!showBackupImage.value) {
+            logger.warn('Video load timeout, attempting retry...')
+            retryVideo()
+          }
+        }, retryConfig.loadTimeout)
+      : null
 
     hls.on(Hls.Events.MANIFEST_PARSED, () => {
       logger.media('HLS manifest loaded, starting playback')
-      clearTimeout(videoLoadTimeout)
-      retryCount = 0 // Reset retry count on successful load
-      stopPeriodicVideoCheck() // Stop periodic checks since video is working
+      if (videoLoadTimeout) {
+        clearTimeout(videoLoadTimeout)
+      }
+      if (ENABLE_RELOAD_AND_IMAGE_SWAP) {
+        retryCount = 0 // Reset retry count on successful load
+        stopPeriodicVideoCheck() // Stop periodic checks since video is working
+      }
       // Don't hide backup image here - let the video playing event handle it
       video.play().catch(e => {
         logger.error('Playback failed:', e)
-        retryVideo()
+        if (ENABLE_RELOAD_AND_IMAGE_SWAP) {
+          retryVideo()
+        }
       })
       setTimeout(startBrightnessAnalysis, 1000)
     })
 
     hls.on(Hls.Events.ERROR, (event, data) => {
       logger.error('HLS error:', data)
-      clearTimeout(videoLoadTimeout)
+      if (videoLoadTimeout) {
+        clearTimeout(videoLoadTimeout)
+      }
+
+      if (!ENABLE_RELOAD_AND_IMAGE_SWAP) {
+        return
+      }
 
       // For any error, attempt retry instead of immediately switching to backup
       if (
@@ -438,30 +494,42 @@
     video.src = videoSrc
 
     // Add timeout to switch to backup image if video doesn't load
-    const videoLoadTimeout = setTimeout(() => {
-      if (!showBackupImage.value) {
-        logger.warn('Video load timeout, attempting retry...')
-        retryVideo()
-      }
-    }, retryConfig.loadTimeout)
+    const videoLoadTimeout = ENABLE_RELOAD_AND_IMAGE_SWAP
+      ? setTimeout(() => {
+          if (!showBackupImage.value) {
+            logger.warn('Video load timeout, attempting retry...')
+            retryVideo()
+          }
+        }, retryConfig.loadTimeout)
+      : null
 
     video.addEventListener('loadedmetadata', () => {
       logger.media('Native HLS manifest loaded, starting playback')
-      clearTimeout(videoLoadTimeout)
-      retryCount = 0 // Reset retry count on successful load
-      stopPeriodicVideoCheck() // Stop periodic checks since video is working
+      if (videoLoadTimeout) {
+        clearTimeout(videoLoadTimeout)
+      }
+      if (ENABLE_RELOAD_AND_IMAGE_SWAP) {
+        retryCount = 0 // Reset retry count on successful load
+        stopPeriodicVideoCheck() // Stop periodic checks since video is working
+      }
       // Don't hide backup image here - let the video playing event handle it
       video.play().catch(e => {
         logger.error('Playback failed:', e)
-        retryVideo()
+        if (ENABLE_RELOAD_AND_IMAGE_SWAP) {
+          retryVideo()
+        }
       })
       setTimeout(startBrightnessAnalysis, 1000)
     })
 
     video.addEventListener('error', e => {
       logger.error('Native HLS error:', e)
-      clearTimeout(videoLoadTimeout)
-      retryVideo()
+      if (videoLoadTimeout) {
+        clearTimeout(videoLoadTimeout)
+      }
+      if (ENABLE_RELOAD_AND_IMAGE_SWAP) {
+        retryVideo()
+      }
     })
   }
 
