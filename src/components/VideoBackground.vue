@@ -43,238 +43,200 @@
 </template>
 
 <script setup>
-  import { ref, onMounted, onUnmounted, watch } from 'vue'
+  import { ref, onMounted, onUnmounted } from 'vue'
   import Hls from 'hls.js'
   import { getVideoConfig } from '../config'
   import { createLogger } from '../utils/logger'
 
   const logger = createLogger('VideoBackground', { media: true })
 
-  // Feature flag: Set to false to disable reload and image swap functionality
-  const ENABLE_RELOAD_AND_IMAGE_SWAP = false
+  // Configuration
+  const videoConfig = getVideoConfig()
+  const videoSrc = videoConfig.sources[videoConfig.currentSource]
+  const retryConfig = videoConfig.retry
+  const GRACE_PERIOD_MS = 5000
+  const RESTORE_TIMEOUT_MS = 10000
+  const SAFETY_CHECK_DELAY_MS = 2000
 
+  // Refs
   const videoRef = ref(null)
   const imageRef = ref(null)
   const canvasRef = ref(null)
   const showBackupImage = ref(false)
-  let hls = null
-  let brightnessAnalysisInterval = null
-  let retryCount = 0
-  const retryTimeout = ref(null)
-  let videoCheckInterval = null
-  let isAttemptingRestore = false
-
-  // Add offline detection
-  const isOffline = ref(false)
-
-  // Listen for offline state changes
-  const handleOfflineStateChange = event => {
-    isOffline.value = event.detail.isOffline
-    if (!ENABLE_RELOAD_AND_IMAGE_SWAP) {
-      logger.info(
-        `🎬 [VideoBackground] Offline state changed: ${isOffline.value} (reload disabled)`
-      )
-      return
-    }
-
-    if (isOffline.value) {
-      logger.info(
-        '🎬 [VideoBackground] Offline detected, stopping video retry attempts'
-      )
-      // Stop any ongoing retry attempts
-      if (retryTimeout.value) {
-        clearTimeout(retryTimeout.value)
-        retryTimeout.value = null
-      }
-      // Keep periodic check running so we can restore when back online
-      startPeriodicVideoCheck()
-    } else {
-      logger.info(
-        '🎬 [VideoBackground] Online detected, attempting to restore video'
-      )
-      // Kick off an immediate restore attempt if backup image is showing
-      startPeriodicVideoCheck()
-      if (showBackupImage.value && !isAttemptingRestore) {
-        retryCount = 0
-        isAttemptingRestore = true
-        initializeVideo()
-      }
-    }
-  }
-
-  // Setup event listener
-  onMounted(() => {
-    window.addEventListener('offline-state-changed', handleOfflineStateChange)
-  })
-
-  onUnmounted(() => {
-    window.removeEventListener(
-      'offline-state-changed',
-      handleOfflineStateChange
-    )
-  })
-
-  // Get video configuration
-  const videoConfig = getVideoConfig()
-  const videoSrc = videoConfig.sources[videoConfig.currentSource]
-  const retryConfig = videoConfig.retry
-
-  // Reactive overlay opacity
   const overlayOpacity = ref(videoConfig.brightnessAnalysis.baseOpacity)
   const canvasWidth = ref(videoConfig.brightnessAnalysis.canvasWidth)
   const canvasHeight = ref(videoConfig.brightnessAnalysis.canvasHeight)
+  const isOffline = ref(false)
+  const retryTimeout = ref(null)
 
-  // Watch for changes to showBackupImage for debugging
-  watch(showBackupImage, newValue => {
-    logger.info('showBackupImage changed to:', newValue)
-  })
+  // State variables
+  let hls = null
+  let brightnessAnalysisInterval = null
+  let videoCheckInterval = null
+  let retryCount = 0
+  let isAttemptingRestore = false
+  let gracePeriodTimeout = null
+  let errorStateStartTime = null
+  let isInErrorState = false
 
-  // Handle video errors and switch to backup image
-  const handleVideoError = () => {
-    if (!ENABLE_RELOAD_AND_IMAGE_SWAP) {
-      logger.warn('Video failed to load (reload and image swap disabled)')
-      return
+  // ============================================================================
+  // Grace Period Management
+  // ============================================================================
+
+  const clearGracePeriod = () => {
+    if (gracePeriodTimeout) {
+      clearTimeout(gracePeriodTimeout)
+      gracePeriodTimeout = null
     }
-
-    logger.warn('Video failed to load, switching to backup image')
-    logger.debug('Current retry count:', retryCount)
-    logger.debug('Max retries:', retryConfig.maxRetries)
-    showBackupImage.value = true
-    isAttemptingRestore = false // Reset the restore attempt flag
-    logger.debug('showBackupImage set to:', showBackupImage.value)
-    // Begin periodic checks so we can restore when connectivity returns
-    startPeriodicVideoCheck()
+    isInErrorState = false
+    errorStateStartTime = null
   }
 
-  // Handle video playing event - hide backup image when video actually starts
-  const handleVideoPlaying = () => {
-    if (!ENABLE_RELOAD_AND_IMAGE_SWAP) {
-      logger.media('Video started playing')
-      return
+  const startGracePeriod = () => {
+    // If already in error state, check if grace period is still active
+    if (isInErrorState && errorStateStartTime) {
+      const elapsed = Date.now() - errorStateStartTime
+      if (elapsed < GRACE_PERIOD_MS) {
+        logger.debug(
+          `Already in grace period, ${GRACE_PERIOD_MS - elapsed}ms remaining`
+        )
+        return
+      }
     }
 
-    logger.media('Video started playing, hiding backup image')
-    showBackupImage.value = false
-    isAttemptingRestore = false // Reset the restore attempt flag
+    clearGracePeriod()
+    isInErrorState = true
+    errorStateStartTime = Date.now()
 
-    // Safety check: if video is still playing after 2 seconds, ensure backup image is hidden
+    logger.debug(`Starting grace period (${GRACE_PERIOD_MS}ms) before failback`)
+
+    gracePeriodTimeout = setTimeout(() => {
+      const video = videoRef.value
+      // Check if video recovered during grace period
+      if (video?.readyState >= 2 && !video.paused && !video.ended) {
+        logger.media('Video recovered during grace period, canceling failback')
+        clearGracePeriod()
+        return
+      }
+
+      logger.warn('Grace period expired, triggering failback')
+      triggerFailback()
+    }, GRACE_PERIOD_MS)
+  }
+
+  const triggerFailback = () => {
+    logger.warn('Grace period expired, attempting retry before failback')
+    clearGracePeriod()
+    retryVideo()
+  }
+
+  // ============================================================================
+  // Video Event Handlers
+  // ============================================================================
+
+  const handleVideoError = () => {
+    logger.warn('Video error detected, starting grace period')
+    startGracePeriod()
+  }
+
+  const handleVideoPlaying = () => {
+    logger.media('Video started playing, hiding backup image')
+    clearGracePeriod()
+    showBackupImage.value = false
+    isAttemptingRestore = false
+
+    // Safety check: ensure backup image is hidden if video is still playing
     setTimeout(() => {
       const video = videoRef.value
-      if (video && !video.paused && !video.ended && showBackupImage.value) {
-        logger.info(
-          'Safety check: video is playing but backup image still showing, hiding it'
-        )
+      if (video?.readyState >= 2 && !video.paused && !video.ended && showBackupImage.value) {
+        logger.info('Safety check: hiding backup image for playing video')
         showBackupImage.value = false
       }
-    }, 2000)
+    }, SAFETY_CHECK_DELAY_MS)
   }
 
-  // Handle video can play event - video is ready to play
   const handleVideoCanPlay = () => {
     logger.media('Video can play, ready to start')
   }
 
-  // Handle video pause event - show backup image if video stops unexpectedly
   const handleVideoPause = () => {
-    if (!ENABLE_RELOAD_AND_IMAGE_SWAP) {
-      logger.media('Video paused')
-      return
-    }
-
-    logger.media('Video paused unexpectedly')
-    // Only show backup image if this wasn't a user-initiated pause
+    logger.media('Video paused')
+    // Only start grace period for unexpected pauses
     if (!showBackupImage.value) {
-      logger.media('Video paused unexpectedly, showing backup image')
-      showBackupImage.value = true
+      logger.media('Video paused unexpectedly, starting grace period')
+      startGracePeriod()
     }
   }
 
-  // Handle video ended event - show backup image when video ends
   const handleVideoEnded = () => {
-    if (!ENABLE_RELOAD_AND_IMAGE_SWAP) {
-      logger.media('Video ended')
-      return
-    }
-
     logger.media('Video ended, showing backup image')
+    clearGracePeriod()
     showBackupImage.value = true
   }
 
-  // Retry video loading with exponential backoff
-  const retryVideo = () => {
-    if (!ENABLE_RELOAD_AND_IMAGE_SWAP) {
-      logger.info('🎬 [VideoBackground] Video retry disabled')
-      return
-    }
+  // ============================================================================
+  // Retry Logic
+  // ============================================================================
 
+  const retryVideo = () => {
     const browserOffline =
-      typeof navigator !== 'undefined' && navigator.onLine === false
-    if (isOffline.value && browserOffline) {
-      logger.info('🎬 [VideoBackground] Skipping video retry - offline')
+      typeof navigator !== 'undefined' && !navigator.onLine
+    if (isOffline.value || browserOffline) {
+      logger.info('Skipping video retry - offline')
       return
     }
 
     if (retryCount >= retryConfig.maxRetries) {
-      logger.warn(
-        '🎬 [VideoBackground] Max retries reached, switching to backup image'
-      )
+      logger.warn('Max retries reached, switching to backup image')
+      clearGracePeriod()
       showBackupImage.value = true
-      // Ensure we keep checking periodically to recover later
       startPeriodicVideoCheck()
       return
     }
 
     retryCount++
-    logger.debug(`🎬 [VideoBackground] Current retry count: ${retryCount}`)
-    logger.debug(`🎬 [VideoBackground] Max retries: ${retryConfig.maxRetries}`)
-
     const delay = Math.min(
       retryConfig.baseDelay * Math.pow(2, retryCount - 1),
       retryConfig.maxDelay
     )
+
     logger.info(
-      `🎬 [VideoBackground] Retrying video load (attempt ${retryCount}/${retryConfig.maxRetries}) in ${delay}ms`
+      `Retrying video load (attempt ${retryCount}/${retryConfig.maxRetries}) in ${delay}ms`
     )
 
     retryTimeout.value = setTimeout(() => {
       if (!isOffline.value) {
-        logger.info('🎬 [VideoBackground] Attempting to restore video...')
+        logger.info('Attempting to restore video...')
         initializeVideo()
       }
     }, delay)
   }
 
-  // Start periodic checking for video availability
-  const startPeriodicVideoCheck = () => {
-    if (!ENABLE_RELOAD_AND_IMAGE_SWAP) {
-      logger.debug('🎬 [VideoBackground] Periodic video check disabled')
-      return
-    }
+  // ============================================================================
+  // Periodic Video Check
+  // ============================================================================
 
+  const startPeriodicVideoCheck = () => {
     if (videoCheckInterval) {
       clearInterval(videoCheckInterval)
     }
 
-    // Check periodically if video is available again
+    const checkInterval = retryConfig.periodicCheckInterval || 60000
     videoCheckInterval = setInterval(() => {
       if (isOffline.value) {
-        logger.debug(
-          '🎬 [VideoBackground] Skipping periodic video check - offline'
-        )
+        logger.debug('Skipping periodic video check - offline')
         return
       }
 
       if (showBackupImage.value && !isAttemptingRestore) {
         logger.media('Periodic check: attempting to restore video...')
-        retryCount = 0 // Reset retry count for periodic attempts
+        retryCount = 0
         isAttemptingRestore = true
-        // Don't hide backup image here - let the video playing event handle it
         initializeVideo()
       }
-    }, retryConfig.periodicCheckInterval || 60000) // Default to 60 seconds if not configured
+    }, checkInterval)
   }
 
-  // Stop periodic checking
   const stopPeriodicVideoCheck = () => {
     if (videoCheckInterval) {
       clearInterval(videoCheckInterval)
@@ -282,63 +244,164 @@
     }
   }
 
-  // Initialize video (either HLS or native)
+  // ============================================================================
+  // Video Initialization
+  // ============================================================================
+
   const initializeVideo = () => {
     const video = videoRef.value
+    if (!video) return
 
-    // Set a timeout to reset the restore attempt flag if video doesn't start
+    // Reset restore attempt flag after timeout
     if (isAttemptingRestore) {
       setTimeout(() => {
         if (isAttemptingRestore) {
           logger.media('Video restore attempt timed out, resetting flag')
           isAttemptingRestore = false
         }
-      }, 10000) // 10 second timeout
+      }, RESTORE_TIMEOUT_MS)
     }
 
-      if (Hls.isSupported()) {
+    if (Hls.isSupported()) {
       setupHls(video)
     } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
       setupNativeHls(video)
     } else {
-      logger.error(
-        'HLS is not supported in this browser, switching to backup image'
-      )
-      if (ENABLE_RELOAD_AND_IMAGE_SWAP) {
-        handleVideoError()
-      }
+      logger.error('HLS is not supported in this browser')
+      triggerFailback()
     }
   }
 
-  // Handle image load and start brightness analysis
+  // ============================================================================
+  // HLS Setup
+  // ============================================================================
+
+  const setupHls = video => {
+    logger.media('Setting up HLS with source:', videoSrc)
+
+    // Clean up existing instance
+    if (hls) {
+      try {
+        hls.destroy()
+      } catch (e) {
+        // Ignore destroy errors
+      }
+      hls = null
+    }
+
+    hls = new Hls({
+      debug: false,
+      enableWorker: true,
+      lowLatencyMode: true,
+    })
+
+    hls.loadSource(videoSrc)
+    hls.attachMedia(video)
+
+    const videoLoadTimeout = setTimeout(() => {
+      if (!showBackupImage.value) {
+        logger.warn('Video load timeout, starting grace period...')
+        startGracePeriod()
+      }
+    }, retryConfig.loadTimeout)
+
+    const clearTimeoutAndGracePeriod = () => {
+      clearTimeout(videoLoadTimeout)
+      clearGracePeriod()
+    }
+
+    hls.on(Hls.Events.MANIFEST_PARSED, () => {
+      logger.media('HLS manifest loaded, starting playback')
+      clearTimeoutAndGracePeriod()
+      retryCount = 0
+      stopPeriodicVideoCheck()
+
+      video.play().catch(e => {
+        logger.error('Playback failed:', e)
+        startGracePeriod()
+      })
+
+      setTimeout(startBrightnessAnalysis, 1000)
+    })
+
+    hls.on(Hls.Events.ERROR, (event, data) => {
+      logger.error('HLS error:', data)
+      clearTimeout(videoLoadTimeout)
+
+      const isFatalError =
+        data.fatal ||
+        data.details === 'manifestLoadError' ||
+        data.details === 'levelLoadError'
+
+      logger.media(
+        `${isFatalError ? 'Fatal' : 'Non-fatal'} HLS error, starting grace period...`
+      )
+      startGracePeriod()
+    })
+  }
+
+  const setupNativeHls = video => {
+    video.src = videoSrc
+
+    const videoLoadTimeout = setTimeout(() => {
+      if (!showBackupImage.value) {
+        logger.warn('Video load timeout, starting grace period...')
+        startGracePeriod()
+      }
+    }, retryConfig.loadTimeout)
+
+    const clearTimeoutAndGracePeriod = () => {
+      clearTimeout(videoLoadTimeout)
+      clearGracePeriod()
+    }
+
+    video.addEventListener('loadedmetadata', () => {
+      logger.media('Native HLS manifest loaded, starting playback')
+      clearTimeoutAndGracePeriod()
+      retryCount = 0
+      stopPeriodicVideoCheck()
+
+      video.play().catch(e => {
+        logger.error('Playback failed:', e)
+        startGracePeriod()
+      })
+
+      setTimeout(startBrightnessAnalysis, 1000)
+    })
+
+    video.addEventListener('error', e => {
+      logger.error('Native HLS error:', e)
+      clearTimeout(videoLoadTimeout)
+      startGracePeriod()
+    })
+  }
+
+  // ============================================================================
+  // Brightness Analysis
+  // ============================================================================
+
   const handleImageLoad = () => {
     logger.media('Backup image loaded, starting brightness analysis')
     setTimeout(startBrightnessAnalysis, 100)
   }
 
-  // Analyze brightness and adjust overlay opacity
   const analyzeBrightness = () => {
     const video = videoRef.value
     const image = imageRef.value
     const canvas = canvasRef.value
-
-    // Use video if available and not hidden, otherwise use image
     const mediaElement = showBackupImage.value ? image : video
 
     if (!mediaElement || !canvas) return
 
-    // Check if image is broken (for backup image)
-    if (
-      showBackupImage.value &&
-      image &&
-      (image.naturalWidth === 0 || image.naturalHeight === 0)
-    ) {
-      logger.debug('Skipping brightness analysis for broken backup image')
+    // Validate media element
+    if (showBackupImage.value) {
+      if (image && (image.naturalWidth === 0 || image.naturalHeight === 0)) {
+        logger.debug('Skipping brightness analysis for broken backup image')
+        return
+      }
+    } else if (video.readyState < 2) {
       return
     }
-
-    // For video, check if it has enough data
-    if (!showBackupImage.value && video.readyState < 2) return
 
     try {
       const ctx = canvas.getContext('2d', { willReadFrequently: true })
@@ -353,25 +416,19 @@
       const data = imageData.data
 
       let totalBrightness = 0
-      let pixelCount = 0
+      const pixelCount = data.length / 4
 
-      // Calculate average brightness from RGB values
+      // Calculate average brightness using luminance formula
       for (let i = 0; i < data.length; i += 4) {
         const r = data[i]
         const g = data[i + 1]
         const b = data[i + 2]
-
-        // Convert RGB to brightness (luminance formula)
-        const brightness = (0.299 * r + 0.587 * g + 0.114 * b) / 255
-        totalBrightness += brightness
-        pixelCount++
+        totalBrightness += (0.299 * r + 0.587 * g + 0.114 * b) / 255
       }
 
       const averageBrightness = totalBrightness / pixelCount
 
-      // Adjust overlay opacity based on brightness
-      // Brighter media = more overlay opacity for better contrast
-      // Darker media = less overlay opacity to maintain visibility
+      // Adjust overlay opacity: brighter media = more opacity for contrast
       const targetOpacity = Math.max(
         videoConfig.brightnessAnalysis.minOpacity,
         Math.min(
@@ -380,29 +437,24 @@
         )
       )
 
-      // Smooth transition to new opacity
       overlayOpacity.value = targetOpacity
     } catch (error) {
       logger.warn('Brightness analysis failed:', error)
-      // Use default opacity if analysis fails
       overlayOpacity.value = videoConfig.brightnessAnalysis.baseOpacity
     }
   }
 
-  // Start brightness analysis
   const startBrightnessAnalysis = () => {
     if (brightnessAnalysisInterval) {
       clearInterval(brightnessAnalysisInterval)
     }
 
-    // Analyze brightness based on config interval for smooth transitions
     brightnessAnalysisInterval = setInterval(
       analyzeBrightness,
       videoConfig.brightnessAnalysis.interval
     )
   }
 
-  // Stop brightness analysis
   const stopBrightnessAnalysis = () => {
     if (brightnessAnalysisInterval) {
       clearInterval(brightnessAnalysisInterval)
@@ -410,141 +462,58 @@
     }
   }
 
-  // Setup HLS.js for video playback
-  const setupHls = video => {
-    logger.media('Setting up HLS with source:', videoSrc)
-    // Destroy any existing instance to avoid duplicate handlers
-    if (hls) {
-      try {
-        hls.destroy()
-      } catch {}
-      hls = null
+  // ============================================================================
+  // Offline State Management
+  // ============================================================================
+
+  const handleOfflineStateChange = event => {
+    isOffline.value = event.detail.isOffline
+
+    if (isOffline.value) {
+      logger.info('Offline detected, stopping video retry attempts')
+      if (retryTimeout.value) {
+        clearTimeout(retryTimeout.value)
+        retryTimeout.value = null
+      }
+      clearGracePeriod()
+      startPeriodicVideoCheck()
+    } else {
+      logger.info('Online detected, attempting to restore video')
+      startPeriodicVideoCheck()
+      if (showBackupImage.value && !isAttemptingRestore) {
+        retryCount = 0
+        isAttemptingRestore = true
+        initializeVideo()
+      }
     }
-    hls = new Hls({
-      debug: false,
-      enableWorker: true,
-      lowLatencyMode: true,
-    })
-
-    hls.loadSource(videoSrc)
-    hls.attachMedia(video)
-
-    // Add timeout to switch to backup image if video doesn't load
-    const videoLoadTimeout = ENABLE_RELOAD_AND_IMAGE_SWAP
-      ? setTimeout(() => {
-          if (!showBackupImage.value) {
-            logger.warn('Video load timeout, attempting retry...')
-            retryVideo()
-          }
-        }, retryConfig.loadTimeout)
-      : null
-
-    hls.on(Hls.Events.MANIFEST_PARSED, () => {
-      logger.media('HLS manifest loaded, starting playback')
-      if (videoLoadTimeout) {
-        clearTimeout(videoLoadTimeout)
-      }
-      if (ENABLE_RELOAD_AND_IMAGE_SWAP) {
-        retryCount = 0 // Reset retry count on successful load
-        stopPeriodicVideoCheck() // Stop periodic checks since video is working
-      }
-      // Don't hide backup image here - let the video playing event handle it
-      video.play().catch(e => {
-        logger.error('Playback failed:', e)
-        if (ENABLE_RELOAD_AND_IMAGE_SWAP) {
-          retryVideo()
-        }
-      })
-      setTimeout(startBrightnessAnalysis, 1000)
-    })
-
-    hls.on(Hls.Events.ERROR, (event, data) => {
-      logger.error('HLS error:', data)
-      if (videoLoadTimeout) {
-        clearTimeout(videoLoadTimeout)
-      }
-
-      if (!ENABLE_RELOAD_AND_IMAGE_SWAP) {
-        return
-      }
-
-      // For any error, attempt retry instead of immediately switching to backup
-      if (
-        data.fatal ||
-        data.details === 'manifestLoadError' ||
-        data.details === 'levelLoadError'
-      ) {
-        logger.media('Fatal HLS error, attempting retry...')
-        retryVideo()
-      } else {
-        // For non-fatal errors, try to recover once, then retry
-        logger.media('Non-fatal HLS error, attempting recovery...')
-        setTimeout(() => {
-          if (!showBackupImage.value) {
-            logger.media('Recovery failed, attempting retry...')
-            retryVideo()
-          }
-        }, 3000)
-      }
-    })
   }
 
-  // Setup native HLS support
-  const setupNativeHls = video => {
-    video.src = videoSrc
-
-    // Add timeout to switch to backup image if video doesn't load
-    const videoLoadTimeout = ENABLE_RELOAD_AND_IMAGE_SWAP
-      ? setTimeout(() => {
-          if (!showBackupImage.value) {
-            logger.warn('Video load timeout, attempting retry...')
-            retryVideo()
-          }
-        }, retryConfig.loadTimeout)
-      : null
-
-    video.addEventListener('loadedmetadata', () => {
-      logger.media('Native HLS manifest loaded, starting playback')
-      if (videoLoadTimeout) {
-        clearTimeout(videoLoadTimeout)
-      }
-      if (ENABLE_RELOAD_AND_IMAGE_SWAP) {
-        retryCount = 0 // Reset retry count on successful load
-        stopPeriodicVideoCheck() // Stop periodic checks since video is working
-      }
-      // Don't hide backup image here - let the video playing event handle it
-      video.play().catch(e => {
-        logger.error('Playback failed:', e)
-        if (ENABLE_RELOAD_AND_IMAGE_SWAP) {
-          retryVideo()
-        }
-      })
-      setTimeout(startBrightnessAnalysis, 1000)
-    })
-
-    video.addEventListener('error', e => {
-      logger.error('Native HLS error:', e)
-      if (videoLoadTimeout) {
-        clearTimeout(videoLoadTimeout)
-      }
-      if (ENABLE_RELOAD_AND_IMAGE_SWAP) {
-        retryVideo()
-      }
-    })
-  }
+  // ============================================================================
+  // Lifecycle
+  // ============================================================================
 
   onMounted(() => {
+    window.addEventListener('offline-state-changed', handleOfflineStateChange)
     initializeVideo()
   })
 
   onUnmounted(() => {
+    window.removeEventListener(
+      'offline-state-changed',
+      handleOfflineStateChange
+    )
     stopBrightnessAnalysis()
     stopPeriodicVideoCheck()
+    clearGracePeriod()
     if (retryTimeout.value) {
       clearTimeout(retryTimeout.value)
     }
     if (hls) {
-      hls.destroy()
+      try {
+        hls.destroy()
+      } catch (e) {
+        // Ignore destroy errors
+      }
     }
   })
 </script>
