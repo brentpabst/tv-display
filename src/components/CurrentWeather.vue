@@ -5,7 +5,7 @@
       <div class="flex items-center justify-end space-x-4">
         <Icon
           :icon="getWeatherIcon(currentConditions?.icon || 'clear')"
-          class="w-24 h-24 text-white"
+          class="w-30 h-30 text-white"
         />
         <div class="flex flex-col">
           <div
