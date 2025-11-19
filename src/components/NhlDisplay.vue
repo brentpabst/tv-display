@@ -88,7 +88,7 @@
           {{ formatGameTime(event.startTimeUTC) }}
         </p>
         <p class="text-sm font-light">
-          {{ formatGameTime(event.startTimeUTC, 'h:mm A') }}
+          {{ formatGameTime(event.startTimeUTC, 'h:mm a') }}
         </p>
       </div>
 
@@ -149,7 +149,7 @@
         {{ getTeamName(nextGame.awayTeam) }} @
         {{ getTeamName(nextGame.homeTeam) }},
         {{ formatGameTime(nextGame.startTimeUTC) }} @
-        {{ formatGameTime(nextGame.startTimeUTC, 'h:mm A') }}
+        {{ formatGameTime(nextGame.startTimeUTC, 'h:mm a') }}
       </p>
     </div>
   </div>
@@ -252,7 +252,8 @@
       const date = parseISO(timeString)
       return format(date, formatStr)
     } catch (error) {
-      return 'TBD'
+      console.error(error)
+      return 'Error'
     }
   }
 
