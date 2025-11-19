@@ -64,7 +64,7 @@
     </div>
 
     <!-- Weather Details -->
-    <div class="mb-3 text-sm text-center">
+    <div class="mb-3 text-sm">
       <!-- First Row: Wind, Sunrise -->
       <div class="flex items-center space-x-4 justify-center mb-1">
         <!-- Wind Speed -->
@@ -100,7 +100,7 @@
         </div>
       </div>
 
-      <!-- Second Row: Feels Like, Pressure -->
+      <!-- Second Row: Humidity, Pressure, Rain -->
       <div class="flex items-center space-x-4 justify-center">
         <!-- Humidity -->
         <div class="flex items-center space-x-2">
@@ -150,7 +150,7 @@
     </div>
 
     <!-- Forecast Section -->
-    <div class="flex space-x-8 justify-end">
+    <div class="flex space-x-8 justify-center">
       <div
         v-for="(day, index) in forecast.slice(0, 3)"
         :key="day.date"
