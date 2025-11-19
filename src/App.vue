@@ -10,6 +10,7 @@
   import Calendar from './components/Calendar.vue'
   import TransitTime from './components/TransitTime.vue'
   import NhlDisplay from './components/NhlDisplay.vue'
+  import ConsoleLogDisplay from './components/ConsoleLogDisplay.vue'
 
   import { useWeatherAlertsStore } from './stores/weatherAlerts'
   const weatherAlertsStore = useWeatherAlertsStore()
@@ -55,6 +56,9 @@
 
     <!-- Weather alerts overlay -->
     <WeatherAlerts />
+
+    <!-- Console log display -->
+    <ConsoleLogDisplay />
   </div>
 </template>
 
