@@ -231,7 +231,7 @@
   import { ref, computed, onMounted, onUnmounted } from 'vue'
   import { storeToRefs } from 'pinia'
   import { useNhlStore } from '../stores/nhl'
-  import { formatDistanceToNow, format, parseISO } from 'date-fns'
+  import { formatDistanceToNow, format, parseISO, isToday } from 'date-fns'
   import { formatDuration } from '../utils/simplifiedUtils'
   import { Icon } from '@iconify/vue'
   import { getIconName } from '../utils/iconUtils'
@@ -250,6 +250,13 @@
     if (!timeString) return 'TBD'
     try {
       const date = parseISO(timeString)
+      
+      // If it's today and we're formatting the date (not the time), show TODAY/TONIGHT
+      if (isToday(date) && formatStr === 'MMM d') {
+        // Use 5 PM (17:00) as the threshold for "TONIGHT" vs "TODAY"
+        return date.getHours() >= 17 ? 'TONIGHT' : 'TODAY'
+      }
+      
       return format(date, formatStr)
     } catch (error) {
       return 'Error'
