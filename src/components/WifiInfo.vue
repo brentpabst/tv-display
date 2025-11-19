@@ -3,7 +3,7 @@
     <h3 class="text-lg font-medium font-thin uppercase">Scan for WiFi</h3>
     <p class="text-white text-sm mb-2">Network: Kerberos</p>
     <div class="bg-white p-4 rounded-lg inline-block">
-      <QRCodeVue :value="wifiQRCode" :size="100" level="M" />
+      <QRCodeVue :value="wifiQRCode" :size="100" level="M" renderAs="svg" />
     </div>
   </div>
 </template>
