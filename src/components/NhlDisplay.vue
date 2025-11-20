@@ -57,28 +57,35 @@
 
       <div v-else-if="isGameActive(gameState)">
         <div v-if="event.clock && !event.clock.inIntermission">
-          <p class="text-base font-thin">
+          <div class="flex flex-col items-center">
             <Icon
               :icon="
                 getIconName(
                   event.clock.running ? 'mdi:loading' : 'mdi:clock-outline'
                 )
               "
-              class="w-4 h-4 text-white/70"
+              :class="[
+                'w-4 h-4 text-white/70 mb-1',
+                event.clock.running ? 'animate-spin' : ''
+              ]"
             />
-            {{ event.clock.timeRemaining || '--:--' }}
-          </p>
-          <p class="text-xs uppercase font-thin">{{ getCurrentPeriod() }}</p>
+            <p class="text-base font-thin">
+              {{ event.clock.timeRemaining || '--:--' }}
+            </p>
+          </div>
+          <p class="text-xs uppercase font-thin mt-1">{{ getCurrentPeriod() }}</p>
         </div>
         <div v-else>
-          <p>
+          <div class="flex flex-col items-center">
             <Icon
               :icon="getIconName('mdi:loading')"
-              class="w-6 h-6 animate-spin"
+              class="w-6 h-6 animate-spin mb-1"
             />
-            {{ event.clock?.timeRemaining || '--:--' }}
-          </p>
-          <p class="text-xs uppercase font-thin">{{ getCurrentPeriod() }}</p>
+            <p class="text-base font-thin">
+              {{ event.clock?.timeRemaining || '--:--' }}
+            </p>
+          </div>
+          <p class="text-xs uppercase font-thin mt-1">{{ getCurrentPeriod() }}</p>
         </div>
       </div>
 
