@@ -73,7 +73,7 @@
               {{ event.clock.timeRemaining || '--:--' }}
             </p>
           </div>
-          <p class="text-xs uppercase font-thin mt-1">{{ getCurrentPeriod() }}</p>
+          <p class="text-xs uppercase font-thin mt-1">{{ currentPeriod }}</p>
         </div>
         <div v-else>
           <div class="flex flex-col items-center">
@@ -85,7 +85,7 @@
               {{ event.clock?.timeRemaining || '--:--' }}
             </p>
           </div>
-          <p class="text-xs uppercase font-thin mt-1">{{ getCurrentPeriod() }}</p>
+          <p class="text-xs uppercase font-thin mt-1">{{ currentPeriod }}</p>
         </div>
       </div>
 
@@ -244,7 +244,7 @@
   import { getIconName } from '../utils/iconUtils'
 
   const nhlStore = useNhlStore()
-  const { event, nextGame, refreshInterval, last_update, isLoading } =
+  const { event, nextGame, refreshInterval, last_update, isLoading, currentPeriod } =
     storeToRefs(nhlStore)
 
   const nextUpdateFormatted = ref()
@@ -268,21 +268,6 @@
     } catch (error) {
       return 'Error'
     }
-  }
-
-  // Get current period description
-  const getCurrentPeriod = () => {
-    if (!event.value) return ''
-    const game = event.value
-
-    if (game.periodDescriptor?.periodType === 'OT') return 'Overtime'
-    if (game.periodDescriptor?.periodType === 'SO') return 'Shootout'
-
-    const period = game.periodDescriptor?.periodNumber || 1
-    if (period === 1) return '1st Period'
-    if (period === 2) return '2nd Period'
-    if (period === 3) return '3rd Period'
-    return `${period}th Period`
   }
 
   // Get broadcast networks
