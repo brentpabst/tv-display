@@ -1,7 +1,7 @@
 <template>
   <div
     class="grid grid-cols-3 gap-1 bg-stone-800/70 backdrop-blur-xs rounded-lg p-3 text-white items-center"
-    v-if="!isLoading && event && event.awayTeam && event.homeTeam"
+    v-if="event && event.awayTeam && event.homeTeam"
   >
     <div class="col-span-3 text-center">
       <p class="text-sm font-light uppercase">
@@ -61,16 +61,16 @@
             <Icon
               :icon="
                 getIconName(
-                  event.clock.running ? 'mdi:loading' : 'mdi:clock-outline'
+                  isClockRunning ? 'mdi:loading' : 'mdi:clock-outline'
                 )
               "
               :class="[
                 'w-4 h-4 text-white/70 mb-1',
-                event.clock.running ? 'animate-spin' : ''
+                isClockRunning ? 'animate-spin' : ''
               ]"
             />
             <p class="text-base font-thin">
-              {{ event.clock.timeRemaining || '--:--' }}
+              {{ displayClockTime }}
             </p>
           </div>
           <p class="text-xs uppercase font-thin mt-1">{{ currentPeriod }}</p>
@@ -82,7 +82,7 @@
               class="w-6 h-6 animate-spin mb-1"
             />
             <p class="text-base font-thin">
-              {{ event.clock?.timeRemaining || '--:--' }}
+              {{ displayClockTime }}
             </p>
           </div>
           <p class="text-xs uppercase font-thin mt-1">{{ currentPeriod }}</p>
@@ -162,7 +162,7 @@
   </div>
   <div
     class="grid gap-1 bg-stone-800/70 backdrop-blur-xs rounded-lg p-3 text-white items-center"
-    v-else-if="isLoading"
+    v-else-if="showSkeleton"
   >
     <!-- Skeleton Loading State -->
     <div class="grid grid-cols-3 gap-1 w-full max-w-2xl mx-auto">
@@ -235,7 +235,7 @@
 </template>
 
 <script setup>
-  import { ref, computed, onMounted, onUnmounted } from 'vue'
+  import { ref, computed, onMounted, onUnmounted, watch } from 'vue'
   import { storeToRefs } from 'pinia'
   import { useNhlStore } from '../stores/nhl'
   import { formatDistanceToNow, format, parseISO, isToday } from 'date-fns'
@@ -248,9 +248,81 @@
     storeToRefs(nhlStore)
 
   const nextUpdateFormatted = ref()
+  
+  // Local game clock countdown state
+  const localClockSeconds = ref(null)
+  const clockRunning = ref(false)
+  const lastClockUpdate = ref(null)
 
   // Computed properties to reduce template complexity
   const gameState = computed(() => event.value?.gameState)
+  
+  // Only show skeleton on initial load, not during refreshes
+  const showSkeleton = computed(() => {
+    return isLoading.value && !event.value
+  })
+  
+  // Parse time string (MM:SS) to total seconds
+  const parseTimeToSeconds = (timeString) => {
+    if (!timeString || timeString === '--:--') return null
+    const parts = timeString.split(':')
+    if (parts.length !== 2) return null
+    const minutes = parseInt(parts[0], 10)
+    const seconds = parseInt(parts[1], 10)
+    if (isNaN(minutes) || isNaN(seconds)) return null
+    return minutes * 60 + seconds
+  }
+  
+  // Format seconds to MM:SS string using date-fns
+  const formatSecondsToTime = (totalSeconds) => {
+    if (totalSeconds === null || totalSeconds < 0) return '--:--'
+    const minutes = Math.floor(totalSeconds / 60)
+    const seconds = totalSeconds % 60
+    // Use date-fns format with a Date object set to the duration
+    // Create date at epoch with the minutes and seconds
+    const durationDate = new Date(0, 0, 0, 0, minutes, seconds)
+    return format(durationDate, 'mm:ss')
+  }
+  
+  // Computed property for display time (local countdown or API time)
+  const displayClockTime = computed(() => {
+    // If we have a local countdown (running or stopped), use it
+    if (localClockSeconds.value !== null) {
+      return formatSecondsToTime(localClockSeconds.value)
+    }
+    // Otherwise use the API time
+    return event.value?.clock?.timeRemaining || '--:--'
+  })
+  
+  // Computed property for clock running state
+  const isClockRunning = computed(() => {
+    // Use local state if we're counting down, otherwise use API state
+    if (localClockSeconds.value !== null) {
+      return clockRunning.value
+    }
+    return event.value?.clock?.running || false
+  })
+  
+  // Watch for clock updates from API and reset local countdown
+  watch(
+    () => event.value?.clock,
+    (newClock) => {
+      if (!newClock) {
+        localClockSeconds.value = null
+        clockRunning.value = false
+        return
+      }
+      
+      // Parse the new time from API
+      const apiSeconds = parseTimeToSeconds(newClock.timeRemaining)
+      if (apiSeconds !== null) {
+        localClockSeconds.value = apiSeconds
+        clockRunning.value = newClock.running || false
+        lastClockUpdate.value = Date.now()
+      }
+    },
+    { immediate: true, deep: true }
+  )
 
   // Format game time using date-fns
   const formatGameTime = (timeString, formatStr = 'MMM d') => {
@@ -323,6 +395,21 @@
           })
         } catch (error) {
           nextUpdateFormatted.value = ''
+        }
+      }
+      
+      // Count down game clock if it's running and not in intermission
+      if (
+        localClockSeconds.value !== null &&
+        clockRunning.value &&
+        !event.value?.clock?.inIntermission
+      ) {
+        if (localClockSeconds.value > 0) {
+          localClockSeconds.value--
+        } else {
+          // Clock reached zero, stop counting
+          clockRunning.value = false
+          localClockSeconds.value = 0
         }
       }
     }, 1000)

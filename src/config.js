@@ -257,7 +257,7 @@ export const appConfig = {
     intervals: {
       preGame: 15 * 60 * 1000, // 15 minutes before game starts
       preGameClose: 30 * 1000, // 30 seconds when game is about to start
-      inGame: 15 * 1000, // 15 seconds during live game
+      inGame: 5 * 1000, // 15 seconds during live game
       postGame: 60 * 60 * 1000, // 1 hour after game ends
     },
   },
